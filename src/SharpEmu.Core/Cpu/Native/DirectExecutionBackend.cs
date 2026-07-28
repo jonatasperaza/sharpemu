@@ -1141,6 +1141,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		result = OrbisGen2Result.ORBIS_GEN2_OK;
 		LastError = null;
 		InitializeRuntimeSymbolIndex(runtimeSymbols);
+		ResetLazyDlsymStubState();
 		_recentImportTraceCount = 0;
 		_recentImportTraceWriteIndex = 0;
 		_distinctImportNidHistoryCount = 0;
@@ -7019,6 +7020,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		ClearImportHandlerTrampolines();
 		_importEntries = Array.Empty<ImportStubEntry>();
 		_runtimeSymbolsByName.Clear();
+		ResetLazyDlsymStubState();
 		StopReadyThreadDispatcher();
 		StopStallWatchdog();
 		if (_exceptionHandler != 0)

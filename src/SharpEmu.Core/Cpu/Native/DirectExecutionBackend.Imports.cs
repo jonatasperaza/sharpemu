@@ -2079,34 +2079,60 @@ public sealed partial class DirectExecutionBackend
 		{
 			return OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT;
 		}
-		ulong symbolNameAddress = cpuContext[CpuRegister.Rsi];
-		ulong outputAddress = cpuContext[CpuRegister.Rdx];
-		if (!TryReadAsciiZ(symbolNameAddress, 512, out var symbolName))
+
+		NormalizeKernelDynlibDlsymArguments(
+			cpuContext,
+			out var symbolNameAddress,
+			out var outputAddress);
+		try
 		{
-			cpuContext[CpuRegister.Rax] = 18446744073709551615uL;
-			return OrbisGen2Result.ORBIS_GEN2_OK;
+			if (!TryReadAsciiZ(symbolNameAddress, 512, out var symbolName))
+			{
+				return CompleteKernelDynlibDlsymFailure(
+					cpuContext,
+					outputAddress);
+			}
+
+			var moduleHandle = unchecked((int)cpuContext[CpuRegister.Rdi]);
+			if (!TryResolveDlsymGuestAddress(
+					moduleHandle,
+					symbolName,
+					out var resolvedAddress))
+			{
+				Console.Error.WriteLine(
+					$"[LOADER][WARN] sceKernelDlsym failed: " +
+					$"handle=0x{cpuContext[CpuRegister.Rdi]:X} " +
+					$"symbol='{symbolName}'");
+				return CompleteKernelDynlibDlsymFailure(
+					cpuContext,
+					outputAddress);
+			}
+
+			if (string.Equals(
+					Environment.GetEnvironmentVariable("SHARPEMU_LOG_DLSYM"),
+					"1",
+					StringComparison.Ordinal))
+			{
+				Console.Error.WriteLine(
+					$"[LOADER][TRACE] sceKernelDlsym: handle=0x{moduleHandle:X} " +
+					$"symbol='{symbolName}' -> 0x{resolvedAddress:X16}");
+			}
+
+			if (outputAddress == 0 ||
+				!TryWriteUInt64Compat(outputAddress, resolvedAddress))
+			{
+				return CompleteKernelDynlibDlsymFailure(
+					cpuContext,
+					outputAddress);
+			}
 		}
-		var moduleHandle = unchecked((int)cpuContext[CpuRegister.Rdi]);
-		if (!TryResolveModuleSymbolAddress(moduleHandle, symbolName, out var resolvedAddress) &&
-			!TryResolveRuntimeSymbolAddress(symbolName, out resolvedAddress) &&
-			!TryResolveRuntimeSymbolAddress(ComputePsNid(symbolName), out resolvedAddress) &&
-			!TryResolveRuntimeSymbolAlias(symbolName, out resolvedAddress))
+		catch
 		{
-			Console.Error.WriteLine(
-				$"[LOADER][WARN] sceKernelDlsym failed: handle=0x{cpuContext[CpuRegister.Rdi]:X} symbol='{symbolName}'");
-			cpuContext[CpuRegister.Rax] = 18446744073709551615uL;
-			return OrbisGen2Result.ORBIS_GEN2_OK;
+			return CompleteKernelDynlibDlsymFailure(
+				cpuContext,
+				outputAddress);
 		}
-		if (string.Equals(Environment.GetEnvironmentVariable("SHARPEMU_LOG_DLSYM"), "1", StringComparison.Ordinal))
-		{
-			Console.Error.WriteLine(
-				$"[LOADER][TRACE] sceKernelDlsym: handle=0x{moduleHandle:X} symbol='{symbolName}' -> 0x{resolvedAddress:X16}");
-		}
-		if (outputAddress == 0L || !TryWriteUInt64Compat(outputAddress, resolvedAddress))
-		{
-			cpuContext[CpuRegister.Rax] = 18446744073709551615uL;
-			return OrbisGen2Result.ORBIS_GEN2_OK;
-		}
+
 		cpuContext[CpuRegister.Rax] = 0uL;
 		return OrbisGen2Result.ORBIS_GEN2_OK;
 	}
@@ -2205,6 +2231,7 @@ public sealed partial class DirectExecutionBackend
 			return OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT;
 		}
 
+		NormalizeKernelDynlibDlsymArguments(cpuContext, out _, out _);
 		ulong bridgeHandle = cpuContext[CpuRegister.Rdi];
 		ulong symbolNameAddress = cpuContext[CpuRegister.Rsi];
 		ulong outputAddress = cpuContext[CpuRegister.Rdx];
