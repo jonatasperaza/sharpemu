@@ -47,6 +47,20 @@ internal static class Gen5ComputeFixtures
         StoreScalarResourceBase: 0,
         StoreBackingBytes: 0);
 
+    // VOP3 unsigned sum-of-absolute-differences operations over packed bytes,
+    // packed 16-bit words, and the complete 32-bit source.
+    public static readonly Gen5ComputeFixture Sad = new(
+        "sad",
+        [
+            0xD55A0005, 0x040E0501, // v_sad_u8    v5, v1, v2, v3
+            0xD55B0006, 0x040E0501, // v_sad_hi_u8 v6, v1, v2, v3
+            0xD55C0007, 0x040E0501, // v_sad_u16   v7, v1, v2, v3
+            0xD55D0008, 0x040E0501, // v_sad_u32   v8, v1, v2, v3
+            0xBF810000,             // s_endpgm
+        ],
+        StoreScalarResourceBase: 0,
+        StoreBackingBytes: 0);
+
     // End-to-end executable program: real ALU results stored to buffer 0 at dword
     // offsets 0/4/8, then proof that a store with EXEC=0 does not land (offset 12
     // keeps its sentinel) and that stores work again once EXEC is restored (16).
@@ -128,7 +142,7 @@ internal static class Gen5ComputeFixtures
         StoreScalarResourceBase: 8,
         StoreBackingBytes: 16);
 
-    public static readonly Gen5ComputeFixture[] All = [Fmac, Muls, ExecStore, Loop, Lds];
+    public static readonly Gen5ComputeFixture[] All = [Fmac, Muls, Sad, ExecStore, Loop, Lds];
 
     // Minimal pixel program: two interpolated attribute channels plus two
     // inline constants exported to MRT0 (done+vm).

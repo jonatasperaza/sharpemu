@@ -58,6 +58,18 @@ public sealed class MslTranslationTests
     }
 
     [Fact]
+    public void UnsignedSadFamilyEmitsPackedAndScalarOperations()
+    {
+        var shader = Gen5ComputeFixtures.CompileOrThrow(Gen5ComputeFixtures.Sad);
+
+        Assert.Contains("min(", shader.Source, StringComparison.Ordinal);
+        Assert.Contains("max(", shader.Source, StringComparison.Ordinal);
+        Assert.Contains("& 0xFFu", shader.Source, StringComparison.Ordinal);
+        Assert.Contains("& 0xFFFFu", shader.Source, StringComparison.Ordinal);
+        Assert.Contains("<< 16", shader.Source, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void UniformsCarryDispatchLimitAndBufferLengths()
     {
         var shader = Gen5ComputeFixtures.CompileOrThrow(Gen5ComputeFixtures.ExecStore);

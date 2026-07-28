@@ -613,6 +613,21 @@ public static partial class Gen5SpirvTranslator
                         GetRawSource(instruction, 2));
                     break;
                 }
+                case "VSadU8":
+                    result = EmitUnsignedSad(instruction, elementBits: 8);
+                    break;
+                case "VSadHiU8":
+                    result = EmitUnsignedSad(
+                        instruction,
+                        elementBits: 8,
+                        shiftResult: true);
+                    break;
+                case "VSadU16":
+                    result = EmitUnsignedSad(instruction, elementBits: 16);
+                    break;
+                case "VSadU32":
+                    result = EmitUnsignedSad(instruction, elementBits: 32);
+                    break;
                 case "VLshrB32":
                     result = EmitIntegerBinary(instruction, SpirvOp.ShiftRightLogical);
                     break;
@@ -3189,6 +3204,52 @@ public static partial class Gen5SpirvTranslator
             }
 
             return _module.AddInstruction(operation, _uintType, left, right);
+        }
+
+        private uint EmitUnsignedSad(
+            Gen5ShaderInstruction instruction,
+            uint elementBits,
+            bool shiftResult = false)
+        {
+            var left = GetRawSource(instruction, 0);
+            var right = GetRawSource(instruction, 1);
+            var sum = UInt(0);
+            var mask = elementBits switch
+            {
+                8 => 0xFFu,
+                16 => 0xFFFFu,
+                32 => uint.MaxValue,
+                _ => throw new ArgumentOutOfRangeException(nameof(elementBits)),
+            };
+
+            for (uint shift = 0; shift < 32; shift += elementBits)
+            {
+                var leftElement = shift == 0
+                    ? left
+                    : ShiftRightLogical(left, UInt(shift));
+                var rightElement = shift == 0
+                    ? right
+                    : ShiftRightLogical(right, UInt(shift));
+                if (elementBits != 32)
+                {
+                    leftElement = BitwiseAnd(leftElement, UInt(mask));
+                    rightElement = BitwiseAnd(rightElement, UInt(mask));
+                }
+
+                var difference = _module.AddInstruction(
+                    SpirvOp.ISub,
+                    _uintType,
+                    Ext(41, _uintType, leftElement, rightElement),
+                    Ext(38, _uintType, leftElement, rightElement));
+                sum = IAdd(sum, difference);
+            }
+
+            if (shiftResult)
+            {
+                sum = ShiftLeftLogical(sum, UInt(16));
+            }
+
+            return IAdd(sum, GetRawSource(instruction, 2));
         }
 
         private enum CubeCoordinate

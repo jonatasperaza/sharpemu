@@ -225,6 +225,13 @@ public static partial class Gen5MslTranslator
                     $"(((({RawSource(instruction, 0)}) & 0xFFFFFFu) * (({RawSource(instruction, 1)}) & 0xFFFFFFu)) + ({RawSource(instruction, 2)}))",
                 "VMadU32U16" =>
                     $"(((({RawSource(instruction, 0)}) & 0xFFFFu) * (({RawSource(instruction, 1)}) & 0xFFFFu)) + ({RawSource(instruction, 2)}))",
+                "VSadU8" => EmitUnsignedSad(instruction, elementBits: 8),
+                "VSadHiU8" => EmitUnsignedSad(
+                    instruction,
+                    elementBits: 8,
+                    shiftResult: true),
+                "VSadU16" => EmitUnsignedSad(instruction, elementBits: 16),
+                "VSadU32" => EmitUnsignedSad(instruction, elementBits: 32),
                 "VAdd3U32" =>
                     $"(({RawSource(instruction, 0)}) + ({RawSource(instruction, 1)}) + ({RawSource(instruction, 2)}))",
                 "VAddLshlU32" =>
@@ -399,6 +406,45 @@ public static partial class Gen5MslTranslator
             var offset = Temp("uint", $"(({RawSource(instruction, 1)}) & 3u) << 3");
             var baseValue = Temp("uint", RawSource(instruction, 2));
             return $"(({baseValue} & ~(0xFFu << {offset})) | (({converted} & 0xFFu) << {offset}))";
+        }
+
+        private string EmitUnsignedSad(
+            Gen5ShaderInstruction instruction,
+            uint elementBits,
+            bool shiftResult = false)
+        {
+            var left = Temp("uint", RawSource(instruction, 0));
+            var right = Temp("uint", RawSource(instruction, 1));
+            var mask = elementBits switch
+            {
+                8 => "0xFFu",
+                16 => "0xFFFFu",
+                32 => string.Empty,
+                _ => throw new ArgumentOutOfRangeException(nameof(elementBits)),
+            };
+            var sum = string.Empty;
+
+            for (uint shift = 0; shift < 32; shift += elementBits)
+            {
+                var leftElement = shift == 0 ? left : $"({left} >> {shift})";
+                var rightElement = shift == 0 ? right : $"({right} >> {shift})";
+                if (elementBits != 32)
+                {
+                    leftElement = $"({leftElement} & {mask})";
+                    rightElement = $"({rightElement} & {mask})";
+                }
+
+                var difference =
+                    $"(max({leftElement}, {rightElement}) - min({leftElement}, {rightElement}))";
+                sum = sum.Length == 0 ? difference : $"({sum} + {difference})";
+            }
+
+            if (shiftResult)
+            {
+                sum = $"({sum} << 16)";
+            }
+
+            return $"({sum} + ({RawSource(instruction, 2)}))";
         }
 
         private string EmitCvtPkrtzF16F32(Gen5ShaderInstruction instruction)
