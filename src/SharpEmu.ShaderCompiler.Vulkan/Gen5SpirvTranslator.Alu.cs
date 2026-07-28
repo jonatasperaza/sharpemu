@@ -948,6 +948,17 @@ public static partial class Gen5SpirvTranslator
                         vector);
                     break;
                 }
+                case "VCvtPkU16U32":
+                case "VCvtPkI16I32":
+                    // Both conversions truncate each source to its low 16
+                    // bits; signedness only describes how the packed halves
+                    // are interpreted by the guest.
+                    result = BitwiseOr(
+                        BitwiseAnd(GetRawSource(instruction, 0), UInt(0xFFFF)),
+                        ShiftLeftLogical(
+                            BitwiseAnd(GetRawSource(instruction, 1), UInt(0xFFFF)),
+                            UInt(16)));
+                    break;
 
                 case "VPkAddF16":
                 case "VPkMulF16":
@@ -2128,6 +2139,26 @@ public static partial class Gen5SpirvTranslator
                             result = IAdd(
                                 ShiftLeftLogical(left, UInt(shift)),
                                 right);
+                            break;
+                        }
+                        case "SAbsdiffI32":
+                        {
+                            // Subtract and negate in 32 bits so the RDNA
+                            // wrapping behavior is preserved for INT_MIN.
+                            var difference = _module.AddInstruction(
+                                SpirvOp.ISub,
+                                _uintType,
+                                left,
+                                right);
+                            var sign = ShiftRightArithmetic(
+                                difference,
+                                UInt(31));
+                            result = _module.AddInstruction(
+                                SpirvOp.ISub,
+                                _uintType,
+                                BitwiseXor(difference, sign),
+                                sign);
+                            Store(_scc, IsNotZero(result));
                             break;
                         }
                         case "SPackLlB32B16":

@@ -1522,9 +1522,16 @@ public static class Gen5ShaderScalarEvaluator
                     break;
                 }
             case "SAbsdiffI32":
-                result = unchecked((uint)Math.Abs((long)(int)left - (int)right));
-                scalarConditionCode = result != 0;
-                break;
+                {
+                    // RDNA performs the subtraction in the signed 32-bit
+                    // domain before taking the absolute value. Preserve both
+                    // wrapping steps, including abs(INT_MIN) == INT_MIN.
+                    var difference = unchecked((int)left - (int)right);
+                    var sign = difference >> 31;
+                    result = unchecked((uint)((difference ^ sign) - sign));
+                    scalarConditionCode = result != 0;
+                    break;
+                }
             case "SLshl1AddU32":
                 {
                     var wide = ((ulong)left << 1) + right;

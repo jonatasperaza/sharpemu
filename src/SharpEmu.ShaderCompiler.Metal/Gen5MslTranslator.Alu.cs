@@ -203,6 +203,8 @@ public static partial class Gen5MslTranslator
                     $"pack_float_to_snorm2x16(float2({F(instruction, 0)}, {F(instruction, 1)}))",
                 "VCvtPknormU16F32" =>
                     $"pack_float_to_unorm2x16(float2({F(instruction, 0)}, {F(instruction, 1)}))",
+                "VCvtPkU16U32" or "VCvtPkI16I32" =>
+                    $"((({RawSource(instruction, 0)}) & 0xFFFFu) | ((({RawSource(instruction, 1)}) & 0xFFFFu) << 16))",
 
                 // ---- integer arithmetic ----
                 "VAddU32" or "VAddI32" =>
@@ -1183,6 +1185,18 @@ public static partial class Gen5MslTranslator
                     var shift = (uint)(instruction.Opcode[5] - '0');
                     resultExpression = $"(({left} << {shift}) + {right})";
                     sccStatement = string.Empty;
+                    break;
+                }
+                case "SAbsdiffI32":
+                {
+                    // Keep the subtraction and absolute value in 32 bits.
+                    // The bitwise form also preserves abs(INT_MIN) == INT_MIN.
+                    var difference = Temp("uint", $"{left} - {right}");
+                    var sign = Temp(
+                        "uint",
+                        $"(uint)(as_type<int>({difference}) >> 31)");
+                    resultExpression = $"(({difference} ^ {sign}) - {sign})";
+                    sccStatement = "NONZERO";
                     break;
                 }
                 case "SPackLlB32B16":

@@ -160,4 +160,26 @@ public sealed class MslTranslationTests
             () => Gen5ComputeFixtures.CompileOrThrow(fixture));
         Assert.Contains("pc=0x", exception.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void PackedIntegerOperations_TranslateWithWrappingSemantics()
+    {
+        var fixture = new Gen5ComputeFixture(
+            "packed-integer",
+            [
+                0x600A0501, // v_cvt_pk_u16_u32 v5, v1, v2
+                0x620C0501, // v_cvt_pk_i16_i32 v6, v1, v2
+                0x96820100, // s_absdiff_i32 s2, s0, s1
+                0xBF810000, // s_endpgm
+            ],
+            StoreScalarResourceBase: 0,
+            StoreBackingBytes: 0);
+
+        var shader = Gen5ComputeFixtures.CompileOrThrow(fixture);
+
+        Assert.Contains("& 0xFFFFu", shader.Source, StringComparison.Ordinal);
+        Assert.Contains("<< 16", shader.Source, StringComparison.Ordinal);
+        Assert.Contains(">> 31", shader.Source, StringComparison.Ordinal);
+        Assert.Contains(" ^ ", shader.Source, StringComparison.Ordinal);
+    }
 }
