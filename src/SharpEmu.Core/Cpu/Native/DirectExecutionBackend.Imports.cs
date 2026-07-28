@@ -34,8 +34,10 @@ public sealed partial class DirectExecutionBackend
 	private const ulong StackCheckGuardValue = 0xC0DEC0DECAFEBA00UL;
 	private static long _canaryReturnRecoveries;
 
+	private const long InitialImportResultLogCount = 8;
+	private const long ImportResultLogSampleInterval = 10_000;
 	private readonly object _importResultLogSampleGate = new();
-	private readonly Dictionary<string, int> _importResultLogSamples = new(StringComparer.Ordinal);
+	private readonly Dictionary<(string Nid, int Result), long> _importResultLogSamples = new();
 	private int _il2CppExceptionDiagnosticCount;
 
 	private static ulong ImportDispatchGatewayManaged(nint backendHandle, int importIndex, nint argPackPtr)
@@ -1511,35 +1513,39 @@ public sealed partial class DirectExecutionBackend
 		var expectedPlayGoChunkEnumerationEnd =
 			string.Equals(nid, "uWIYLFkkwqk", StringComparison.Ordinal) &&
 			resultValue == unchecked((int)0x80B2000C);
-		if (!expectedFileProbeMiss &&
-			!expectedTimedWaitTimeout &&
-			!expectedEqueueTimeout &&
-			!expectedMutexTrylockBusy &&
-			!expectedSemaphoreTrywaitAgain &&
-			!expectedPollSemaBusy &&
-			!expectedNetAcceptWouldBlock &&
-			!expectedUserServiceNoEvent &&
-			!expectedPrivacyInvalidParameter &&
-			!expectedPlayGoChunkEnumerationEnd)
-		{
-			return true;
-		}
-
-		if (!ShouldLogExpectedImportResults())
+		var expectedResult =
+			expectedFileProbeMiss ||
+			expectedTimedWaitTimeout ||
+			expectedEqueueTimeout ||
+			expectedMutexTrylockBusy ||
+			expectedSemaphoreTrywaitAgain ||
+			expectedPollSemaBusy ||
+			expectedNetAcceptWouldBlock ||
+			expectedUserServiceNoEvent ||
+			expectedPrivacyInvalidParameter ||
+			expectedPlayGoChunkEnumerationEnd;
+		if (expectedResult && !ShouldLogExpectedImportResults())
 		{
 			return false;
 		}
 
-		var key = nid + "\0" + resultValue;
-		int count;
+		// Guest polling loops can produce millions of identical failures. Preserve
+		// the initial diagnostics, then sample them without allocating a key string
+		// for every dispatch.
+		var key = (nid, resultValue);
+		long count;
 		lock (_importResultLogSampleGate)
 		{
 			_importResultLogSamples.TryGetValue(key, out count);
-			count++;
-			_importResultLogSamples[key] = count;
+			if (count < long.MaxValue)
+			{
+				count++;
+				_importResultLogSamples[key] = count;
+			}
 		}
 
-		return count <= 8 || count % 10000 == 0;
+		return count <= InitialImportResultLogCount ||
+			count % ImportResultLogSampleInterval == 0;
 	}
 
 	private static bool ShouldLogExpectedImportResults() =>
