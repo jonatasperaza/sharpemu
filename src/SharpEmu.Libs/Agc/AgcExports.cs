@@ -6408,12 +6408,15 @@ public static partial class AgcExports
         for (uint index = 0; index < registerCount; index++)
         {
             var entryAddress = registersAddress + ((ulong)index * 8);
-            if (!TryReadUInt32(ctx, entryAddress, out var registerOffset) ||
+            if (!TryReadUInt32(ctx, entryAddress, out var encodedRegister) ||
                 !TryReadUInt32(ctx, entryAddress + sizeof(uint), out var value))
             {
                 return;
             }
 
+            var registerOffset = DecodeIndirectRegisterOffset(
+                encodedRegister,
+                register == RCxRegsIndirect);
             // The indirect table has an explicit count; offset zero is a real
             // context-register index (DB_RENDER_CONTROL), not a terminator.
             // Dropping it leaves stale depth/render-control state active in
@@ -6424,6 +6427,25 @@ public static partial class AgcExports
                 ApplyUcIndexTypeIfNeeded(state, registerOffset, value);
             }
         }
+    }
+
+    internal static uint DecodeIndirectRegisterOffset(
+        uint encodedRegister,
+        bool contextRegister)
+    {
+        // BuildInterpolantMapping may use a virtual context-register bank.
+        // The real driver resolves 0x10000000+n to SPI_PS_INPUT_CNTL_n when
+        // it consumes the indirect array. Other register identifiers are
+        // already hardware offsets and must remain unchanged.
+        const uint virtualPsInputCntl0 = 0x10000000u;
+        if (contextRegister &&
+            encodedRegister >= virtualPsInputCntl0 &&
+            encodedRegister < virtualPsInputCntl0 + 32u)
+        {
+            return SpiPsInputCntl0 + (encodedRegister - virtualPsInputCntl0);
+        }
+
+        return encodedRegister;
     }
 
     /// <summary>
@@ -12438,14 +12460,20 @@ public static partial class AgcExports
         for (uint i = 0; i < tracedCount; i++)
         {
             var entryAddress = registersAddress + ((ulong)i * 8);
-            if (!TryReadUInt32(ctx, entryAddress, out var registerOffset) ||
+            if (!TryReadUInt32(ctx, entryAddress, out var encodedRegister) ||
                 !TryReadUInt32(ctx, entryAddress + 4, out var value))
             {
                 TraceAgc($"agc.dcb.indirect_read_failed space={registerSpace} index={i} addr=0x{entryAddress:X16}");
                 return;
             }
 
-            TraceAgc($"agc.dcb.reg space={registerSpace} index={i} offset=0x{registerOffset:X4} value=0x{value:X8}");
+            var registerOffset = DecodeIndirectRegisterOffset(
+                encodedRegister,
+                register == RCxRegsIndirect);
+            TraceAgc(
+                $"agc.dcb.reg space={registerSpace} index={i} " +
+                $"encoded=0x{encodedRegister:X8} offset=0x{registerOffset:X4} " +
+                $"value=0x{value:X8}");
         }
 
         if (tracedCount != registerCount)
