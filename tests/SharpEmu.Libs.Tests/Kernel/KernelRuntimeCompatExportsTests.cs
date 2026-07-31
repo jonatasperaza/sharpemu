@@ -1,6 +1,7 @@
 // Copyright (C) 2026 SharpEmu Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+using SharpEmu.HLE;
 using SharpEmu.Libs.Kernel;
 using Xunit;
 
@@ -24,6 +25,22 @@ public sealed class KernelRuntimeCompatExportsTests
             frequencyHz = 0;
             return false;
         };
+
+    [Fact]
+    public void WriteThrottlingStatus_WritesUnthrottledTier()
+    {
+        const ulong memoryBase = 0x1_0000_0000;
+        const ulong statusAddress = memoryBase + 0x100;
+        var memory = new FakeCpuMemory(memoryBase, 0x1000);
+        var context = new CpuContext(memory, Generation.Gen5);
+        context[CpuRegister.Rdi] = statusAddress;
+
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelRuntimeCompatExports.KernelWriteThrottlingStatus(context));
+        Assert.True(context.TryReadUInt64(statusAddress, out var status));
+        Assert.Equal(0x4B00UL, status);
+    }
 
     [Fact]
     public void WithoutHostRdtsc_ReportsStopwatchFrequency_NotHardwareTsc()

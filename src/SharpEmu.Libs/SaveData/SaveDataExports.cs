@@ -688,6 +688,14 @@ public static class SaveDataExports
         }
     }
 
+    // PS5 variant that keeps the PS4 cond/result layout.
+    [SysAbiExport(
+        Nid = "X4MYzukPc3g",
+        ExportName = "sceSaveDataDirNameSearchPs4",
+        Target = Generation.Gen5,
+        LibraryName = "libSceSaveData")]
+    public static int SaveDataDirNameSearchPs4(CpuContext ctx) => SaveDataDirNameSearch(ctx);
+
     [SysAbiExport(
         Nid = "ZP4e7rlzOUk",
         ExportName = "sceSaveDataMount3",

@@ -1523,6 +1523,30 @@ public static class KernelRuntimeCompatExports
     }
 
     [SysAbiExport(
+        Nid = "YFC3dBBipj8",
+        ExportName = "sceKernelWriteThrottlingStatus",
+        Target = Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int KernelWriteThrottlingStatus(CpuContext ctx)
+    {
+        var outStatusAddress = ctx[CpuRegister.Rdi];
+        if (outStatusAddress == 0)
+        {
+            return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT;
+        }
+
+        // Callers scale the first qword by <<16 and classify it against write-bandwidth
+        // tiers topping out at 0x4AF00001; 0x4B00 << 16 lands in the unthrottled tier.
+        if (!ctx.TryWriteUInt64(outStatusAddress, 0x4B00))
+        {
+            return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
+        }
+
+        ctx[CpuRegister.Rax] = 0;
+        return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+    }
+
+    [SysAbiExport(
         Nid = "Xjoosiw+XPI",
         ExportName = "sceKernelUuidCreate",
         Target = Generation.Gen4 | Generation.Gen5,
