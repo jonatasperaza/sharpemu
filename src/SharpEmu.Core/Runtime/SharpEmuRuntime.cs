@@ -634,39 +634,16 @@ public sealed class SharpEmuRuntime : ISharpEmuRuntime
             return loadedImages;
         }
 
-        var moduleDirectories = new[]
-        {
-            (Path: Path.Combine(ebootDirectory, "sce_module"), StartAtBoot: true),
-            (Path: Path.Combine(ebootDirectory, "sce_modules"), StartAtBoot: true),
-            (Path: Path.Combine(ebootDirectory, "Media", "Modules"), StartAtBoot: true),
-            // Unity native plugins are loaded later through sceKernelLoadStartModule. Map
-            // them up front so the HLE loader can return a real module handle and dlsym
-            // can resolve their exports, but defer DT_INIT until the guest requests them.
-            (Path: Path.Combine(ebootDirectory, "Media", "Plugins"), StartAtBoot: false),
-        }
-        .GroupBy(entry => entry.Path, StringComparer.OrdinalIgnoreCase)
-        .Select(group => group.First())
-        .Where(entry => Directory.Exists(entry.Path))
-        .ToArray();
-
-        if (moduleDirectories.Length == 0)
+        var allModulePaths = DiscoverAdjacentModuleFiles(ebootDirectory);
+        if (allModulePaths.Count == 0)
         {
             return loadedImages;
         }
 
-        var allModulePaths = moduleDirectories
-            .SelectMany(directory => Directory
-                .EnumerateFiles(directory.Path)
-                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
-                .Select(path => (Path: path, directory.StartAtBoot)))
-            .Where(entry =>
-            {
-                var extension = Path.GetExtension(entry.Path);
-                return string.Equals(extension, ".prx", StringComparison.OrdinalIgnoreCase) ||
-                       string.Equals(extension, ".sprx", StringComparison.OrdinalIgnoreCase);
-            })
-            .GroupBy(entry => entry.Path, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First())
+        var moduleDirectories = allModulePaths
+            .Select(entry => Path.GetDirectoryName(entry.Path))
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
         var modulePaths = allModulePaths
@@ -687,7 +664,7 @@ public sealed class SharpEmuRuntime : ISharpEmuRuntime
             return loadedImages;
         }
 
-        Console.Error.WriteLine($"[RUNTIME] Module search directories: {string.Join(", ", moduleDirectories.Select(entry => entry.Path))}");
+        Console.Error.WriteLine($"[RUNTIME] Module search directories: {string.Join(", ", moduleDirectories)}");
         Console.Error.WriteLine($"[RUNTIME] Loading {modulePaths.Length} module(s)...");
         var loadedModules = 0;
         var failedModules = 0;
@@ -742,6 +719,51 @@ public sealed class SharpEmuRuntime : ISharpEmuRuntime
         Console.Error.WriteLine(
             $"[RUNTIME] Module preload summary: loaded={loadedModules}, failed={failedModules}, merged_imports={mergedImportCount}, merged_symbols={mergedSymbolCount}");
         return loadedImages;
+    }
+
+    internal static IReadOnlyList<(string Path, bool StartAtBoot)> DiscoverAdjacentModuleFiles(
+        string ebootDirectory)
+    {
+        var moduleDirectories = new[]
+        {
+            (Path: Path.Combine(ebootDirectory, "sce_module"), StartAtBoot: true),
+            (Path: Path.Combine(ebootDirectory, "sce_modules"), StartAtBoot: true),
+            (Path: Path.Combine(ebootDirectory, "Media", "Modules"), StartAtBoot: true),
+            // Unity native plugins are loaded later through sceKernelLoadStartModule. Map
+            // them up front so the HLE loader can return a real module handle and dlsym
+            // can resolve their exports, but defer DT_INIT until the guest requests them.
+            (Path: Path.Combine(ebootDirectory, "Media", "Plugins"), StartAtBoot: false),
+            // Native game middleware such as Cohtml, Renoir, and FMOD is commonly
+            // installed next to eboot.bin rather than under sce_module.
+            (Path: ebootDirectory, StartAtBoot: true),
+        }
+        .GroupBy(entry => entry.Path, StringComparer.OrdinalIgnoreCase)
+        .Select(group => group.First())
+            .Where(entry => Directory.Exists(entry.Path))
+            .ToArray();
+
+        if (moduleDirectories.Length == 0)
+        {
+            return Array.Empty<(string Path, bool StartAtBoot)>();
+        }
+
+        return moduleDirectories
+            .SelectMany(directory => Directory
+                .EnumerateFiles(directory.Path)
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .Select(path => (Path: path, directory.StartAtBoot)))
+            .Where(entry =>
+            {
+                var extension = Path.GetExtension(entry.Path);
+                return string.Equals(extension, ".prx", StringComparison.OrdinalIgnoreCase) ||
+                       string.Equals(extension, ".sprx", StringComparison.OrdinalIgnoreCase);
+            })
+            // A dump can contain the same module both beside eboot.bin and under
+            // sce_module. Prefer the conventional module directory encountered
+            // above and load each module name only once.
+            .GroupBy(entry => Path.GetFileName(entry.Path), StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToArray();
     }
 
     private static void InstallNativePluginCompatibilityHooks(

@@ -2921,7 +2921,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0x85);
 		int hostPauseJump = offset;
 		EmitUInt32(code, ref offset, 0u);
-		EmitByte(code, ref offset, 0xF0); EmitByte(code, ref offset, 0x4C);
+		EmitByte(code, ref offset, 0xF0); EmitByte(code, ref offset, 0x4D);
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0xB1); EmitByte(code, ref offset, 0x11); // lock cmpxchg [r9], r10
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0x85);
 		int hostRetryJump = offset;
@@ -3004,7 +3004,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0x85);
 		int guestPauseJump = offset;
 		EmitUInt32(code, ref offset, 0u);
-		EmitByte(code, ref offset, 0xF0); EmitByte(code, ref offset, 0x4C);
+		EmitByte(code, ref offset, 0xF0); EmitByte(code, ref offset, 0x4D);
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0xB1); EmitByte(code, ref offset, 0x11);
 		EmitByte(code, ref offset, 0x0F); EmitByte(code, ref offset, 0x85);
 		int guestRetryJump = offset;
@@ -3134,11 +3134,25 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 
 	private unsafe void PatchTlsPatterns()
 	{
-        // Large Gen5 executables can keep valid code well past the first 32 MiB.
-        // Astro Bot, for example, has an FS:[0] TLS load near +0x70A0000.
-        const ulong MaxScanBytes = 134217728uL;
+		// Scan the complete executable mapping that contains the current entry
+		// point. Large Gen5 images can place valid TLS accesses beyond an
+		// arbitrary fixed window (Minecraft reaches one near +0xB78D700).
+		const ulong FallbackMaxScanBytes = 134217728uL;
 		ulong num = _entryPoint;
-		ulong num2 = num + MaxScanBytes;
+		ulong num2 = _entryPoint > ulong.MaxValue - FallbackMaxScanBytes
+			? ulong.MaxValue
+			: _entryPoint + FallbackMaxScanBytes;
+		if (_cpuContext is not null &&
+			TryGetVirtualMemory(_cpuContext, out var virtualMemory) &&
+			TryGetExecutableScanRange(
+				virtualMemory.SnapshotRegions(),
+				_entryPoint,
+				out var regionStart,
+				out var regionEnd))
+		{
+			num = regionStart;
+			num2 = regionEnd;
+		}
 		int num3 = 0;
 		int num4 = 0;
 		int num9 = 0;
@@ -3188,6 +3202,31 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 			num = num6 > num ? num6 : num + 4096uL;
 		}
 		Console.Error.WriteLine($"[LOADER][INFO] Patched {num3} TLS loads, {num9} TLS stores, {num4} stack-canary accesses, {sse4aPatchCount} SSE4a EXTRQ blends");
+	}
+
+	internal static bool TryGetExecutableScanRange(
+		IReadOnlyList<VirtualMemoryRegion> regions,
+		ulong entryPoint,
+		out ulong start,
+		out ulong end)
+	{
+		foreach (var region in regions)
+		{
+			if ((region.Protection & ProgramHeaderFlags.Execute) == 0 ||
+				!ContainsAddress(region.VirtualAddress, region.MemorySize, entryPoint) ||
+				region.VirtualAddress > ulong.MaxValue - region.MemorySize)
+			{
+				continue;
+			}
+
+			start = region.VirtualAddress;
+			end = region.VirtualAddress + region.MemorySize;
+			return end > start;
+		}
+
+		start = 0;
+		end = 0;
+		return false;
 	}
 
 	private unsafe bool TryPatchSse4aExtrqBlend(nint address, byte* source)

@@ -450,6 +450,49 @@ public static class KernelPthreadCompatExports
         LibraryName = "libKernel")]
     public static int PosixPthreadMutexattrSetprotocol(CpuContext ctx) => PthreadMutexattrSetprotocolCore(ctx, ctx[CpuRegister.Rdi], unchecked((int)ctx[CpuRegister.Rsi]));
 
+    // Cond attrs are accepted but ignored: PthreadCondInitCore never reads the
+    // attr argument, so init just writes a nonzero opaque handle.
+    [SysAbiExport(
+        Nid = "mKoTx03HRWA",
+        ExportName = "pthread_condattr_init",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int PosixPthreadCondattrInit(CpuContext ctx)
+    {
+        var attrAddress = ctx[CpuRegister.Rdi];
+        if (attrAddress == 0)
+        {
+            return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT;
+        }
+
+        if (!KernelMemoryCompatExports.TryWriteUInt64Compat(ctx, attrAddress, 1))
+        {
+            return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
+        }
+
+        return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+    }
+
+    [SysAbiExport(
+        Nid = "dJcuQVn6-Iw",
+        ExportName = "pthread_condattr_destroy",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int PosixPthreadCondattrDestroy(CpuContext ctx) =>
+        ctx[CpuRegister.Rdi] == 0
+            ? (int)OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT
+            : (int)OrbisGen2Result.ORBIS_GEN2_OK;
+
+    [SysAbiExport(
+        Nid = "EjllaAqAPZo",
+        ExportName = "pthread_condattr_setclock",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int PosixPthreadCondattrSetclock(CpuContext ctx) =>
+        ctx[CpuRegister.Rdi] == 0
+            ? (int)OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT
+            : (int)OrbisGen2Result.ORBIS_GEN2_OK;
+
     [SysAbiExport(
         Nid = "2Tb92quprl0",
         ExportName = "scePthreadCondInit",

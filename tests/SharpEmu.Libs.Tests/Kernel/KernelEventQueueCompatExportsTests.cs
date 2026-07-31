@@ -80,6 +80,23 @@ public sealed class KernelEventQueueCompatExportsTests
     }
 
     [Fact]
+    public void AddAndDeleteReadEvent_OnValidQueueSucceeds()
+    {
+        var handle = CreateEqueue();
+        var (context, _) = NewContextWithOutSlot();
+        context[CpuRegister.Rdi] = handle;
+        context[CpuRegister.Rsi] = 0x71;
+        context[CpuRegister.Rcx] = 0x1234;
+
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelEventQueueCompatExports.KernelAddReadEvent(context));
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelEventQueueCompatExports.KernelDeleteReadEvent(context));
+    }
+
+    [Fact]
     public void TriggerUserEvent_OnUnknownQueueReturnsNotFound()
     {
         var (context, _) = NewContextWithOutSlot();
