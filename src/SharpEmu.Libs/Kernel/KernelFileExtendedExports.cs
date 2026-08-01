@@ -424,6 +424,16 @@ public static partial class KernelMemoryCompatExports
         var command = unchecked((int)ctx[CpuRegister.Rsi]);
         var argument = unchecked((int)ctx[CpuRegister.Rdx]);
 
+        if (KernelSocketCompatExports.TryFcntlSocket(
+                ctx,
+                fd,
+                command,
+                argument,
+                out var socketResult))
+        {
+            return socketResult;
+        }
+
         switch (command)
         {
             case F_DUPFD:

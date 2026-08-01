@@ -799,6 +799,7 @@ public static class KernelPthreadCompatExports
         }
         if (!InitializeMutexObject(ctx, handle, state))
         {
+            TryFreeOpaqueObject(ctx, handle);
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
         }
 
@@ -810,6 +811,7 @@ public static class KernelPthreadCompatExports
             _mutexStates.TryRemove(mutexAddress, out _);
             _mutexStates.TryRemove(handle, out _);
 
+            TryFreeOpaqueObject(ctx, handle);
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
         }
 
@@ -829,6 +831,15 @@ public static class KernelPthreadCompatExports
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_NOT_FOUND;
         }
 
+        var handleAddress = resolvedAddress;
+        if (KernelMemoryCompatExports.TryReadUInt64Compat(ctx, mutexAddress, out var pointedHandle) &&
+            pointedHandle != 0 &&
+            _mutexStates.TryGetValue(pointedHandle, out var pointedState) &&
+            ReferenceEquals(pointedState, state))
+        {
+            handleAddress = pointedHandle;
+        }
+
         lock (state.SyncRoot)
         {
             if (state.OwnerThreadId != 0 || state.RecursionCount != 0 || state.Waiters.Count != 0)
@@ -837,6 +848,7 @@ public static class KernelPthreadCompatExports
             }
 
             _mutexStates.TryRemove(resolvedAddress, out _);
+            _mutexStates.TryRemove(handleAddress, out _);
             if (resolvedAddress != mutexAddress)
             {
                 _mutexStates.TryRemove(mutexAddress, out _);
@@ -844,6 +856,7 @@ public static class KernelPthreadCompatExports
         }
 
         _ = KernelMemoryCompatExports.TryWriteUInt64Compat(ctx, mutexAddress, 0);
+        TryFreeOpaqueObject(ctx, handleAddress);
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
 
@@ -1130,6 +1143,7 @@ public static class KernelPthreadCompatExports
         var initialState = new PthreadMutexAttrState(MutexTypeErrorCheck, 0);
         if (!WriteMutexAttrObject(ctx, handle, initialState))
         {
+            TryFreeOpaqueObject(ctx, handle);
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
         }
 
@@ -1147,6 +1161,7 @@ public static class KernelPthreadCompatExports
                 _mutexAttrStates.Remove(handle);
             }
 
+            TryFreeOpaqueObject(ctx, handle);
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
         }
 
@@ -1161,15 +1176,27 @@ public static class KernelPthreadCompatExports
         }
 
         var resolvedAddress = ResolveMutexAttrHandle(ctx, attrAddress);
+        var handleAddress = resolvedAddress;
         lock (_stateGate)
         {
+            if (_mutexAttrStates.TryGetValue(resolvedAddress, out var state) &&
+                KernelMemoryCompatExports.TryReadUInt64Compat(ctx, attrAddress, out var pointedHandle) &&
+                pointedHandle != 0 &&
+                _mutexAttrStates.TryGetValue(pointedHandle, out var pointedState) &&
+                pointedState == state)
+            {
+                handleAddress = pointedHandle;
+            }
+
             _mutexAttrStates.Remove(resolvedAddress);
+            _mutexAttrStates.Remove(handleAddress);
             if (resolvedAddress != attrAddress)
             {
                 _mutexAttrStates.Remove(attrAddress);
             }
         }
 
+        TryFreeOpaqueObject(ctx, handleAddress);
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
 
@@ -1454,10 +1481,26 @@ public static class KernelPthreadCompatExports
             return false;
         }
 
+        PthreadCondState? racedState = null;
         lock (_stateGate)
         {
-            _condStates[condAddress] = createdState;
-            _condStates[handle] = createdState;
+            if (_condStates.TryGetValue(condAddress, out var existingState))
+            {
+                racedState = existingState;
+            }
+            else
+            {
+                _condStates[condAddress] = createdState;
+                _condStates[handle] = createdState;
+            }
+        }
+
+        if (racedState is not null)
+        {
+            TryFreeOpaqueObject(ctx, handle);
+            resolvedAddress = condAddress;
+            state = racedState;
+            return true;
         }
 
         if (!KernelMemoryCompatExports.TryWriteUInt64Compat(ctx, condAddress, handle))
@@ -1468,6 +1511,7 @@ public static class KernelPthreadCompatExports
                 _condStates.Remove(handle);
             }
 
+            TryFreeOpaqueObject(ctx, handle);
             return false;
         }
 
@@ -1487,7 +1531,22 @@ public static class KernelPthreadCompatExports
 
         Span<byte> initialData = stackalloc byte[size];
         initialData.Clear();
-        return ctx.Memory.TryWrite(address, initialData);
+        if (ctx.Memory.TryWrite(address, initialData))
+        {
+            return true;
+        }
+
+        _ = allocator.TryFreeGuestMemory(address);
+        address = 0;
+        return false;
+    }
+
+    private static void TryFreeOpaqueObject(CpuContext ctx, ulong address)
+    {
+        if (address != 0 && ctx.Memory is IGuestMemoryAllocator allocator)
+        {
+            _ = allocator.TryFreeGuestMemory(address);
+        }
     }
 
     private static bool InitializeMutexObject(CpuContext ctx, ulong address, PthreadMutexState state) =>
@@ -1532,6 +1591,7 @@ public static class KernelPthreadCompatExports
                 _condStates.Remove(handle);
             }
 
+            TryFreeOpaqueObject(ctx, handle);
             return (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
         }
 
@@ -1546,6 +1606,7 @@ public static class KernelPthreadCompatExports
         }
 
         var resolvedAddress = ResolveCondHandle(ctx, condAddress);
+        var handleAddress = resolvedAddress;
         lock (_stateGate)
         {
             if (!_condStates.TryGetValue(resolvedAddress, out var state))
@@ -1561,7 +1622,16 @@ public static class KernelPthreadCompatExports
                 }
             }
 
+            if (KernelMemoryCompatExports.TryReadUInt64Compat(ctx, condAddress, out var pointedHandle) &&
+                pointedHandle != 0 &&
+                _condStates.TryGetValue(pointedHandle, out var pointedState) &&
+                ReferenceEquals(pointedState, state))
+            {
+                handleAddress = pointedHandle;
+            }
+
             _condStates.Remove(resolvedAddress);
+            _condStates.Remove(handleAddress);
             if (resolvedAddress != condAddress)
             {
                 _condStates.Remove(condAddress);
@@ -1569,6 +1639,7 @@ public static class KernelPthreadCompatExports
         }
 
         _ = KernelMemoryCompatExports.TryWriteUInt64Compat(ctx, condAddress, 0);
+        TryFreeOpaqueObject(ctx, handleAddress);
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
 
@@ -2164,6 +2235,7 @@ public static class KernelPthreadCompatExports
         }
         if (!InitializeMutexObject(ctx, handle, createdState))
         {
+            TryFreeOpaqueObject(ctx, handle);
             resolvedAddress = 0;
             state = null;
             return false;
@@ -2173,12 +2245,14 @@ public static class KernelPthreadCompatExports
         {
             if (_mutexStates.TryGetValue(mutexAddress, out state))
             {
+                TryFreeOpaqueObject(ctx, handle);
                 resolvedAddress = mutexAddress;
                 return true;
             }
 
             if (_mutexStates.TryGetValue(handle, out state))
             {
+                TryFreeOpaqueObject(ctx, handle);
                 resolvedAddress = handle;
                 return true;
             }
@@ -2192,6 +2266,7 @@ public static class KernelPthreadCompatExports
             _mutexStates.TryRemove(mutexAddress, out _);
             _mutexStates.TryRemove(handle, out _);
 
+            TryFreeOpaqueObject(ctx, handle);
             resolvedAddress = 0;
             state = null;
             return false;

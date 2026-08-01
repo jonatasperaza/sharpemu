@@ -125,6 +125,22 @@ public static class KernelExports
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
 
+    // libc forwards its public __cxa_thread_atexit wrapper to this kernel-side
+    // implementation. Thread-local destructors are accepted but not executed
+    // when the emulated thread exits yet.
+#pragma warning disable SHEM006 // Standard ABI name is absent from the friendly-name catalog.
+    [SysAbiExport(
+        Nid = "qBS714-Jr3g",
+        ExportName = "__cxa_thread_atexit_impl",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int CxaThreadAtexitImpl(CpuContext ctx)
+    {
+        ctx[CpuRegister.Rax] = 0;
+        return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+    }
+#pragma warning restore SHEM006
+
     [SysAbiExport(
         Nid = "H2e8t5ScQGc",
         ExportName = "__cxa_finalize",

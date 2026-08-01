@@ -1146,6 +1146,14 @@ public static class KernelPthreadExtendedCompatExports
     public static int PosixPthreadRwlockWrlock(CpuContext ctx) => PthreadRwlockWrlock(ctx);
 
     [SysAbiExport(
+        Nid = "bIHoZCTomsI",
+        ExportName = "scePthreadRwlockTrywrlock",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int PthreadRwlockTrywrlock(CpuContext ctx) =>
+        PthreadRwlockTryLockCore(ctx, ctx[CpuRegister.Rdi], write: true);
+
+    [SysAbiExport(
         Nid = "SFxTMOfuCkE",
         ExportName = "pthread_rwlock_tryrdlock",
         Target = Generation.Gen4 | Generation.Gen5,

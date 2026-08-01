@@ -121,6 +121,31 @@ public static class AppContentExports
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
 
+    [SysAbiExport(
+        Nid = "SaKib2Ug0yI",
+        ExportName = "sceAppContentTemporaryDataGetAvailableSpaceKb",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libSceAppContent")]
+    public static int AppContentTemporaryDataGetAvailableSpaceKb(CpuContext ctx)
+    {
+        const ulong availableSpaceKb = 1024UL * 1024UL; // 1 GiB
+        var mountPointAddress = ctx[CpuRegister.Rdi];
+        var availableSpaceAddress = ctx[CpuRegister.Rsi];
+        if (mountPointAddress == 0 || availableSpaceAddress == 0)
+        {
+            return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT);
+        }
+
+        Span<byte> spaceBytes = stackalloc byte[sizeof(ulong)];
+        BinaryPrimitives.WriteUInt64LittleEndian(spaceBytes, availableSpaceKb);
+        if (!ctx.Memory.TryWrite(availableSpaceAddress, spaceBytes))
+        {
+            return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
+        }
+
+        return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_OK);
+    }
+
     // Download data is not emulated as a real quota; report a comfortable
     // fixed amount of free space so titles never take the "storage full" path.
     [SysAbiExport(

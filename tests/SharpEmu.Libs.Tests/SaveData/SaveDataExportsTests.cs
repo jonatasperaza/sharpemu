@@ -34,6 +34,9 @@ public sealed class SaveDataExportsTests : IDisposable
     private const ulong TransactionOut = Base + 0xE00;
     private const ulong StaleR8 = Base + 0xE08;
     private const ulong StaleR9 = Base + 0xE10;
+    private const ulong SecondMountParam = Base + 0xF00;
+    private const ulong SecondMountResult = Base + 0xF40;
+    private const ulong SecondDirNamePtr = Base + 0xF80;
 
     private const int NoEvent = unchecked((int)0x809F0008);
     private const int ParameterError = unchecked((int)0x809F0000);
@@ -141,6 +144,26 @@ public sealed class SaveDataExportsTests : IDisposable
         Assert.Equal(0, SaveDataExports.SaveDataIsMounted(Reg(rsi: EventOut)));
         Assert.True(_ctx.TryReadUInt32(EventOut, out var mounted));
         Assert.Equal(1u, mounted);
+    }
+
+    [Fact]
+    public void Mount_ConcurrentSlotsReceiveDistinctMountPoints()
+    {
+        Assert.Equal(0, Mount());
+
+        WriteAscii(SecondDirNamePtr, "SAVE0001");
+        Span<byte> secondParam = stackalloc byte[0x30];
+        secondParam.Clear();
+        BinaryPrimitives.WriteInt32LittleEndian(secondParam, UserId);
+        BinaryPrimitives.WriteUInt64LittleEndian(secondParam[0x08..], SecondDirNamePtr);
+        BinaryPrimitives.WriteUInt32LittleEndian(secondParam[0x20..], MountModeCreate);
+        Assert.True(_memory.TryWrite(SecondMountParam, secondParam));
+
+        Assert.Equal(
+            0,
+            SaveDataExports.SaveDataMount3(Reg(rdi: SecondMountParam, rsi: SecondMountResult)));
+        Assert.Equal("/savedata0", ReadAscii(MountResult, 16));
+        Assert.Equal("/savedata1", ReadAscii(SecondMountResult, 16));
     }
 
     [Fact]
@@ -287,5 +310,13 @@ public sealed class SaveDataExportsTests : IDisposable
         Assert.True(_ctx.TryReadUInt32(StaleR8, out var rcxValue));
         Assert.NotEqual(0u, resource);
         Assert.Equal(sentinel, rcxValue);
+    }
+
+    private string ReadAscii(ulong address, int length)
+    {
+        var bytes = new byte[length];
+        Assert.True(_memory.TryRead(address, bytes));
+        var terminator = Array.IndexOf(bytes, (byte)0);
+        return Encoding.ASCII.GetString(bytes, 0, terminator >= 0 ? terminator : bytes.Length);
     }
 }

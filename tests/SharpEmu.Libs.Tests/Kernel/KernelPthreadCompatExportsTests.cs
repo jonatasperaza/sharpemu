@@ -50,4 +50,24 @@ public sealed class KernelPthreadCompatExportsTests
             (int)OrbisGen2Result.ORBIS_GEN2_OK,
             KernelPthreadCompatExports.PosixPthreadCondattrSetclock(context));
     }
+
+    [Fact]
+    public void SceRwlockTrywrlock_AcquiresWithoutBlocking()
+    {
+        const ulong memoryBase = 0x1_1000_0000;
+        const ulong rwlockAddress = memoryBase + 0x100;
+        var memory = new FakeCpuMemory(memoryBase, 0x1000);
+        var context = new CpuContext(memory, Generation.Gen5);
+        context[CpuRegister.Rdi] = rwlockAddress;
+
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelPthreadExtendedCompatExports.PthreadRwlockInit(context));
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelPthreadExtendedCompatExports.PthreadRwlockTrywrlock(context));
+        Assert.Equal(
+            (int)OrbisGen2Result.ORBIS_GEN2_OK,
+            KernelPthreadExtendedCompatExports.PthreadRwlockUnlock(context));
+    }
 }

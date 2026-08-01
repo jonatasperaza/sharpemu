@@ -281,6 +281,121 @@ public sealed class PthreadMutexSemanticsTests
         Assert.Equal(0, KernelPthreadCompatExports.PthreadMutexUnlock(context));
     }
 
+    [Fact]
+    public void DestroyedSynchronizationObjects_ReleaseOpaqueGuestAllocations()
+    {
+        const ulong memoryBase = 0x1_0020_0000;
+        const ulong mutexAddress = memoryBase + 0x100;
+        const ulong attrAddress = memoryBase + 0x200;
+        const ulong condAddress = memoryBase + 0x300;
+        var memory = new SingleSlotAllocatingCpuMemory(memoryBase, 0x4000);
+        var context = new CpuContext(memory, Generation.Gen5);
+
+        for (var iteration = 0; iteration < 3; iteration++)
+        {
+            context[CpuRegister.Rdi] = mutexAddress;
+            context[CpuRegister.Rsi] = 0;
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadMutexInit(context));
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadMutexDestroy(context));
+
+            context[CpuRegister.Rdi] = attrAddress;
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadMutexattrInit(context));
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadMutexattrDestroy(context));
+
+            context[CpuRegister.Rdi] = condAddress;
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadCondInit(context));
+            Assert.Equal(0, KernelPthreadCompatExports.PthreadCondDestroy(context));
+        }
+
+        Assert.Equal(9, memory.AllocationCount);
+        Assert.Equal(memory.AllocationCount, memory.FreeCount);
+    }
+
+    private sealed class SingleSlotAllocatingCpuMemory : ICpuMemory, IGuestMemoryAllocator
+    {
+        private readonly ulong _baseAddress;
+        private readonly byte[] _storage;
+        private readonly ulong _allocationAddress;
+        private bool _allocated;
+
+        public SingleSlotAllocatingCpuMemory(ulong baseAddress, int size)
+        {
+            _baseAddress = baseAddress;
+            _storage = new byte[size];
+            _allocationAddress = baseAddress + 0x1000;
+        }
+
+        public int AllocationCount { get; private set; }
+
+        public int FreeCount { get; private set; }
+
+        public bool TryRead(ulong virtualAddress, Span<byte> destination)
+        {
+            if (!TryResolve(virtualAddress, destination.Length, out var offset))
+            {
+                return false;
+            }
+
+            _storage.AsSpan(offset, destination.Length).CopyTo(destination);
+            return true;
+        }
+
+        public bool TryWrite(ulong virtualAddress, ReadOnlySpan<byte> source)
+        {
+            if (!TryResolve(virtualAddress, source.Length, out var offset))
+            {
+                return false;
+            }
+
+            source.CopyTo(_storage.AsSpan(offset, source.Length));
+            return true;
+        }
+
+        public bool TryAllocateGuestMemory(ulong size, ulong alignment, out ulong address)
+        {
+            if (_allocated || size > 0x100 || alignment > 0x10)
+            {
+                address = 0;
+                return false;
+            }
+
+            _allocated = true;
+            AllocationCount++;
+            address = _allocationAddress;
+            return true;
+        }
+
+        public bool TryFreeGuestMemory(ulong address)
+        {
+            if (!_allocated || address != _allocationAddress)
+            {
+                return false;
+            }
+
+            _allocated = false;
+            FreeCount++;
+            return true;
+        }
+
+        private bool TryResolve(ulong virtualAddress, int length, out int offset)
+        {
+            offset = 0;
+            if (virtualAddress < _baseAddress)
+            {
+                return false;
+            }
+
+            var relative = virtualAddress - _baseAddress;
+            if (relative + (ulong)length > (ulong)_storage.Length)
+            {
+                return false;
+            }
+
+            offset = (int)relative;
+            return true;
+        }
+    }
+
     private sealed class AllocatingCpuMemory : ICpuMemory, IGuestMemoryAllocator
     {
         private readonly ulong _baseAddress;

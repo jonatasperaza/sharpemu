@@ -32,6 +32,7 @@ public static class SaveDataExports
     private const uint MountModeCreate = 1u << 2;
     private const uint MountModeCreate2 = 1u << 5;
     private const int MountResultSize = 0x40;
+    private const int MountSlotCount = 16;
     // Emulator guard against corrupt or misread sizes, not a platform limit.
     private const ulong SaveDataMemoryMaxSize = 64UL * 1024 * 1024;
     private static readonly object _stateGate = new();
@@ -53,9 +54,16 @@ public static class SaveDataExports
             _events.Clear();
         }
 
+        string[] staleMountPoints;
         lock (_mountGate)
         {
+            staleMountPoints = _mounts.Keys.ToArray();
             _mounts.Clear();
+        }
+
+        foreach (var mountPoint in staleMountPoints)
+        {
+            KernelMemoryCompatExports.UnregisterGuestPathMount(mountPoint);
         }
     }
 
@@ -780,11 +788,32 @@ public static class SaveDataExports
                 Directory.CreateDirectory(savePath);
             }
 
-            const string mountPoint = "/savedata0";
-            KernelMemoryCompatExports.RegisterGuestPathMount(mountPoint, savePath);
+            string? mountPoint = null;
             lock (_mountGate)
             {
-                _mounts[mountPoint] = new MountEntry(savePath, dirName, userId);
+                if (_mounts.Values.Any(
+                    entry => string.Equals(entry.SlotDir, savePath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return SetReturn(ctx, OrbisSaveDataErrorBusy);
+                }
+
+                for (var slot = 0; slot < MountSlotCount; slot++)
+                {
+                    var candidate = $"/savedata{slot}";
+                    if (!_mounts.ContainsKey(candidate))
+                    {
+                        mountPoint = candidate;
+                        break;
+                    }
+                }
+
+                if (mountPoint is null)
+                {
+                    return SetReturn(ctx, OrbisSaveDataErrorBusy);
+                }
+
+                KernelMemoryCompatExports.RegisterGuestPathMount(mountPoint, savePath);
+                _mounts.Add(mountPoint, new MountEntry(savePath, dirName, userId));
             }
 
             Span<byte> result = stackalloc byte[MountResultSize];
@@ -793,6 +822,11 @@ public static class SaveDataExports
             BinaryPrimitives.WriteUInt32LittleEndian(result[0x1C..], createIfMissing && !existed ? 1u : 0u);
             if (!ctx.Memory.TryWrite(resultAddress, result))
             {
+                lock (_mountGate)
+                {
+                    _mounts.Remove(mountPoint);
+                }
+                KernelMemoryCompatExports.UnregisterGuestPathMount(mountPoint);
                 return SetReturn(ctx, (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
             }
 

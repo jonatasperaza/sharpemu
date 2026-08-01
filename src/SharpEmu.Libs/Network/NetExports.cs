@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using SharpEmu.HLE;
+using SharpEmu.Libs.Kernel;
 
 namespace SharpEmu.Libs.Network;
 
@@ -193,7 +194,16 @@ public static class NetExports
         ExportName = "setsockopt",
         Target = Generation.Gen4 | Generation.Gen5,
         LibraryName = "libKernel")]
-    public static int PosixSetsockopt(CpuContext ctx) => NetSetsockopt(ctx);
+    public static int PosixSetsockopt(CpuContext ctx)
+    {
+        var fd = unchecked((int)ctx[CpuRegister.Rdi]);
+        return KernelSocketCompatExports.TrySetSocketOption(
+            ctx,
+            fd,
+            out var socketResult)
+                ? socketResult
+                : NetSetsockopt(ctx);
+    }
 
     /// <summary>
     /// Reads back the socket options this backend actually tracks: SO_NBIO,
@@ -270,6 +280,68 @@ public static class NetExports
 
         TraceNet("socket.getsockopt", id, unchecked((uint)option), unchecked((uint)value), 0);
         return ctx.SetReturn(0);
+    }
+
+    [SysAbiExport(
+        Nid = "6Oc0bLsIYe0",
+        ExportName = "sceNetGetMacAddress",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libSceNet")]
+    public static int NetGetMacAddress(CpuContext ctx)
+    {
+        var address = ctx[CpuRegister.Rdi];
+        if (address == 0)
+        {
+            return ctx.SetReturn(NetErrorInvalidArgument);
+        }
+
+        // Stable, locally administered address. Exposing a host adapter's real
+        // address would be both unnecessary for emulation and host-dependent.
+        ReadOnlySpan<byte> mac = stackalloc byte[6]
+        {
+            0x02, 0x00, 0x00, 0x53, 0x45, 0x01,
+        };
+        if (!ctx.Memory.TryWrite(address, mac))
+        {
+            return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
+        }
+
+        TraceNet("get_mac", 0, address, 0, 0);
+        return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_OK);
+    }
+
+    [SysAbiExport(
+        Nid = "v6M4txecCuo",
+        ExportName = "sceNetEtherNtostr",
+        Target = Generation.Gen4 | Generation.Gen5,
+        LibraryName = "libSceNet")]
+    public static int NetEtherNtostr(CpuContext ctx)
+    {
+        var etherAddress = ctx[CpuRegister.Rdi];
+        var stringAddress = ctx[CpuRegister.Rsi];
+        var length = ctx[CpuRegister.Rdx];
+        if (etherAddress == 0 || stringAddress == 0 || length < 18)
+        {
+            return ctx.SetReturn(NetErrorInvalidArgument);
+        }
+
+        Span<byte> mac = stackalloc byte[6];
+        if (!ctx.Memory.TryRead(etherAddress, mac))
+        {
+            return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
+        }
+
+        var text = $"{mac[0]:x2}:{mac[1]:x2}:{mac[2]:x2}:{mac[3]:x2}:{mac[4]:x2}:{mac[5]:x2}";
+        Span<byte> formatted = stackalloc byte[18];
+        Encoding.ASCII.GetBytes(text, formatted);
+        formatted[^1] = 0;
+        if (!ctx.Memory.TryWrite(stringAddress, formatted))
+        {
+            return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
+        }
+
+        TraceNet("ether_ntostr", 0, etherAddress, stringAddress, length);
+        return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_OK);
     }
 
     [SysAbiExport(

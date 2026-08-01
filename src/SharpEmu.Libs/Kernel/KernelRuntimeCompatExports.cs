@@ -1523,6 +1523,30 @@ public static class KernelRuntimeCompatExports
     }
 
     [SysAbiExport(
+        Nid = "tU5e3f9gSiU",
+        ExportName = "sceKernelIsTrinityMode",
+        Target = Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int KernelIsTrinityMode(CpuContext ctx)
+    {
+        ctx[CpuRegister.Rax] = 0;
+        return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+    }
+
+    [SysAbiExport(
+        Nid = "uvT2iYBBnkY",
+        ExportName = "sceKernelSync",
+        Target = Generation.Gen5,
+        LibraryName = "libKernel")]
+    public static int KernelSync(CpuContext ctx)
+    {
+        // PS5's wrapper follows BSD sync(): it has no arguments and schedules
+        // dirty filesystem buffers for writeback. Emulated file writes already
+        // go through host streams, so there is no separate guest cache to flush.
+        return ctx.SetReturn(OrbisGen2Result.ORBIS_GEN2_OK);
+    }
+
+    [SysAbiExport(
         Nid = "YFC3dBBipj8",
         ExportName = "sceKernelWriteThrottlingStatus",
         Target = Generation.Gen5,
