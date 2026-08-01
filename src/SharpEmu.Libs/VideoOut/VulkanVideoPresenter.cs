@@ -5706,6 +5706,7 @@ internal static unsafe class VulkanVideoPresenter
                     $"queue={_activeGuestQueue.Name} addr=0x{work.Address:X16} " +
                     $"found={(source is not null)} initialized={(source?.Initialized ?? false)}");
                 return;
+            }
 
             EnsureGuestSubmissionCapacity();
             var snapshot = CreateGuestFlipSnapshot(source, work.Version);
@@ -5899,38 +5900,8 @@ internal static unsafe class VulkanVideoPresenter
                     DestroyGuestImage(snapshot);
                 }
             }
-        }}
-
-        private static AccessFlags GetFlipImageAccessMask(
-            ImageLayout layout)
-        {
-            return layout switch
-            {
-                ImageLayout.ShaderReadOnlyOptimal =>
-                    AccessFlags.ShaderReadBit |
-                    AccessFlags.MemoryWriteBit,
-        
-                ImageLayout.General =>
-                    AccessFlags.ShaderReadBit |
-                    AccessFlags.ShaderWriteBit |
-                    AccessFlags.MemoryReadBit |
-                    AccessFlags.MemoryWriteBit,
-        
-                ImageLayout.ColorAttachmentOptimal =>
-                    AccessFlags.ColorAttachmentReadBit |
-                    AccessFlags.ColorAttachmentWriteBit,
-        
-                ImageLayout.TransferSrcOptimal =>
-                    AccessFlags.TransferReadBit,
-        
-                ImageLayout.TransferDstOptimal =>
-                    AccessFlags.TransferWriteBit,
-        
-                _ =>
-                    AccessFlags.MemoryReadBit |
-                    AccessFlags.MemoryWriteBit,
-            };
         }
+
 
         private void ExecuteOrderedGuestFlipWait(VulkanOrderedGuestFlipWait work)
         {
