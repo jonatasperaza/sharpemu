@@ -5695,6 +5695,7 @@ internal static unsafe class VulkanVideoPresenter
         private void ExecuteOrderedGuestFlip(VulkanOrderedGuestFlip work)
         {
             FlushBatchedGuestCommands();
+            
             _guestImages.TryGetValue(work.Address, out var source);
             if (_deviceLost ||
                 source is null ||
@@ -5705,7 +5706,6 @@ internal static unsafe class VulkanVideoPresenter
                     $"queue={_activeGuestQueue.Name} addr=0x{work.Address:X16} " +
                     $"found={(source is not null)} initialized={(source?.Initialized ?? false)}");
                 return;
-            }
 
             EnsureGuestSubmissionCapacity();
             var snapshot = CreateGuestFlipSnapshot(source, work.Version);
@@ -5726,10 +5726,12 @@ internal static unsafe class VulkanVideoPresenter
                 barriers[0] = new ImageMemoryBarrier
                 {
                     SType = StructureType.ImageMemoryBarrier,
-                    SrcAccessMask = AccessFlags.ShaderReadBit |
-                                    AccessFlags.ShaderWriteBit |
-                                    AccessFlags.ColorAttachmentWriteBit |
-                                    AccessFlags.TransferWriteBit,
+                    SrcAccessMask =
+                        AccessFlags.ShaderReadBit |
+                        AccessFlags.ShaderWriteBit |
+                        AccessFlags.ColorAttachmentWriteBit |
+                        AccessFlags.TransferWriteBit |
+                        AccessFlags.MemoryWriteBit,
                     DstAccessMask = AccessFlags.TransferReadBit,
                     OldLayout = ImageLayout.ShaderReadOnlyOptimal,
                     NewLayout = ImageLayout.TransferSrcOptimal,
@@ -5783,9 +5785,12 @@ internal static unsafe class VulkanVideoPresenter
                 {
                     SType = StructureType.ImageMemoryBarrier,
                     SrcAccessMask = AccessFlags.TransferReadBit,
-                    DstAccessMask = AccessFlags.ShaderReadBit |
-                                    AccessFlags.ShaderWriteBit |
-                                    AccessFlags.ColorAttachmentWriteBit,
+                    DstAccessMask =
+                        AccessFlags.ShaderReadBit |
+                        AccessFlags.ShaderWriteBit |
+                        AccessFlags.ColorAttachmentWriteBit |
+                        AccessFlags.MemoryReadBit |
+                        AccessFlags.MemoryWriteBit,
                     OldLayout = ImageLayout.TransferSrcOptimal,
                     NewLayout = ImageLayout.ShaderReadOnlyOptimal,
                     SrcQueueFamilyIndex = Vk.QueueFamilyIgnored,
@@ -5822,6 +5827,7 @@ internal static unsafe class VulkanVideoPresenter
                     "vkEndCommandBuffer(flip capture)");
                 SubmitGuestCommandBuffer(commandBuffer, [], []);
                 submitted = true;
+                
                 snapshot.Initialized = true;
                 _guestImageVersions.Add(work.Version, snapshot);
                 _capturedGuestFlipVersions.Add(work.Version);
@@ -5893,6 +5899,37 @@ internal static unsafe class VulkanVideoPresenter
                     DestroyGuestImage(snapshot);
                 }
             }
+        }}
+
+        private static AccessFlags GetFlipImageAccessMask(
+            ImageLayout layout)
+        {
+            return layout switch
+            {
+                ImageLayout.ShaderReadOnlyOptimal =>
+                    AccessFlags.ShaderReadBit |
+                    AccessFlags.MemoryWriteBit,
+        
+                ImageLayout.General =>
+                    AccessFlags.ShaderReadBit |
+                    AccessFlags.ShaderWriteBit |
+                    AccessFlags.MemoryReadBit |
+                    AccessFlags.MemoryWriteBit,
+        
+                ImageLayout.ColorAttachmentOptimal =>
+                    AccessFlags.ColorAttachmentReadBit |
+                    AccessFlags.ColorAttachmentWriteBit,
+        
+                ImageLayout.TransferSrcOptimal =>
+                    AccessFlags.TransferReadBit,
+        
+                ImageLayout.TransferDstOptimal =>
+                    AccessFlags.TransferWriteBit,
+        
+                _ =>
+                    AccessFlags.MemoryReadBit |
+                    AccessFlags.MemoryWriteBit,
+            };
         }
 
         private void ExecuteOrderedGuestFlipWait(VulkanOrderedGuestFlipWait work)
@@ -5920,6 +5957,7 @@ internal static unsafe class VulkanVideoPresenter
         
         private int _flipCaptureSuccessTraceCount;
         private int _presentResolveTraceCount;
+        private int _flipSnapshotReadbackTraceCount;
 
         private GuestImageResource CreateGuestFlipSnapshot(
             GuestImageResource source,
@@ -15205,8 +15243,31 @@ internal static unsafe class VulkanVideoPresenter
 
                 return;
             }
-            if (ownsPresentedGuestImageVersion)
+            if (ownsPresentedGuestImageVersion &&
+                presentedGuestImage is not null &&
+                presentedGuestImage.Initialized)
             {
+                var readbackIndex =
+                    Interlocked.Increment(ref _flipSnapshotReadbackTraceCount);
+            
+                // Primeiros frames: captura todos para detectar imagem/preto.
+                // Depois: captura periodicamente até a tela de menu.
+                var shouldReadback =
+                    readbackIndex <= 20 ||
+                    readbackIndex <= 300 && readbackIndex % 10 == 0;
+            
+                if (shouldReadback)
+                {
+                    Console.Error.WriteLine(
+                        $"[LOADER][TRACE] vk.flip_snapshot_readback#{readbackIndex} " +
+                        $"version={presentation.GuestImageVersion} " +
+                        $"addr=0x{presentedGuestImage.Address:X16}");
+            
+                    TraceGuestImageContents(presentedGuestImage);
+                }
+            }
+            if (ownsPresentedGuestImageVersion)
+            {   
                 System.Diagnostics.Debug.Assert(
                     _frameGuestImageVersions[frameSlot] is null,
                     "A reusable frame slot cannot still own a flip version.");
