@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 using SharpEmu.HLE.Host;
+using System.Diagnostics;
 
 namespace SharpEmu.Libs.Pad;
 
@@ -10,6 +11,8 @@ public static class HostWindowInput
 {
     private static readonly object Gate = new();
     private static readonly HashSet<int> PressedKeys = new();
+    private static readonly Dictionary<int, long> LatchedKeyReleaseDeadlines = new();
+    private static readonly long MinimumKeyPressTicks = Math.Max(1, Stopwatch.Frequency / 20);
     private static bool _focused;
     private static bool _gamepadConnected;
     private static string? _gamepadName;
@@ -24,6 +27,7 @@ public static class HostWindowInput
             _focused = true;
             _gamepadOutput = gamepadOutput;
             PressedKeys.Clear();
+            LatchedKeyReleaseDeadlines.Clear();
         }
 
         HostWindowInputSource.Set(Source);
@@ -39,6 +43,7 @@ public static class HostWindowInput
             _gamepadState = default;
             _gamepadOutput = null;
             PressedKeys.Clear();
+            LatchedKeyReleaseDeadlines.Clear();
         }
 
         HostWindowInputSource.Clear(Source);
@@ -52,6 +57,7 @@ public static class HostWindowInput
             if (!focused)
             {
                 PressedKeys.Clear();
+                LatchedKeyReleaseDeadlines.Clear();
             }
         }
     }
@@ -63,10 +69,15 @@ public static class HostWindowInput
             if (down)
             {
                 PressedKeys.Add(virtualKey);
+                LatchedKeyReleaseDeadlines.Remove(virtualKey);
             }
-            else
+            else if (PressedKeys.Remove(virtualKey))
             {
-                PressedKeys.Remove(virtualKey);
+                // SDL can deliver a complete key-down/key-up pair before the
+                // guest performs its next scePadRead. Keep a short tap visible
+                // long enough for at least one normal input poll to observe it.
+                LatchedKeyReleaseDeadlines[virtualKey] =
+                    Stopwatch.GetTimestamp() + MinimumKeyPressTicks;
             }
         }
     }
@@ -117,7 +128,23 @@ public static class HostWindowInput
         {
             lock (Gate)
             {
-                return PressedKeys.Contains(virtualKey);
+                if (PressedKeys.Contains(virtualKey))
+                {
+                    return true;
+                }
+
+                if (!LatchedKeyReleaseDeadlines.TryGetValue(virtualKey, out var deadline))
+                {
+                    return false;
+                }
+
+                if (Stopwatch.GetTimestamp() < deadline)
+                {
+                    return true;
+                }
+
+                LatchedKeyReleaseDeadlines.Remove(virtualKey);
+                return false;
             }
         }
 
