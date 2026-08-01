@@ -793,8 +793,15 @@ public static class SaveDataExports
             lock (_mountGate)
             {
                 if (_mounts.Values.Any(
-                    entry => string.Equals(entry.SlotDir, savePath, StringComparison.OrdinalIgnoreCase)))
+                    entry => string.Equals(
+                        entry.SlotDir,
+                        savePath,
+                        StringComparison.OrdinalIgnoreCase)))
                 {
+                    TraceSaveData(
+                        $"mount_busy reason=duplicate_path " +
+                        $"requested='{savePath}' active_mounts={_mounts.Count}");
+                
                     return SetReturn(ctx, OrbisSaveDataErrorBusy);
                 }
 
@@ -810,6 +817,10 @@ public static class SaveDataExports
 
                 if (mountPoint is null)
                 {
+                    TraceSaveData(
+                        $"mount_busy reason=no_free_slot " +
+                        $"requested='{savePath}' active_mounts={_mounts.Count}");
+                
                     return SetReturn(ctx, OrbisSaveDataErrorBusy);
                 }
 
@@ -825,7 +836,11 @@ public static class SaveDataExports
             {
                 lock (_mountGate)
                 {
-                    _mounts.Remove(mountPoint);
+                    var removed = _mounts.Remove(mountPoint);
+                
+                    TraceSaveData(
+                        $"umount2 mount='{mountPoint}' " +
+                        $"removed={removed} remaining={_mounts.Count}");
                 }
                 KernelMemoryCompatExports.UnregisterGuestPathMount(mountPoint);
                 return SetReturn(ctx, (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
