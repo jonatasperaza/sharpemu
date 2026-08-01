@@ -13986,6 +13986,12 @@ public static partial class AgcExports
         var tracePackets = string.Equals(
             Environment.GetEnvironmentVariable("SHARPEMU_LOG_AGC"), "1", StringComparison.Ordinal);
 
+        // Multi-DCB submission is Minecraft's normal graphics path. The
+        // presenter needs the live guest-memory view to publish writable
+        // storage-buffer results (for example generated vertex/index data)
+        // after a release/acquire synchronization point, just like the
+        // single-DCB and ACB entry points do.
+        GuestGpu.Current.AttachGuestMemory(ctx.Memory);
         var gpuState = _submittedGpuStates.GetValue(ctx.Memory, static _ => new SubmittedGpuState());
         lock (gpuState.Gate)
         {

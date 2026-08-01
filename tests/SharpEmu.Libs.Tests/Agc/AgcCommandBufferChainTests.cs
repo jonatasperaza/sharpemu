@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 using System.Buffers.Binary;
+using System.Reflection;
 using SharpEmu.HLE;
 using SharpEmu.Libs.Agc;
 using SharpEmu.Libs.Kernel;
+using SharpEmu.Libs.VideoOut;
 using Xunit;
 
 namespace SharpEmu.Libs.Tests.Agc;
@@ -39,6 +41,9 @@ public sealed class AgcCommandBufferChainTests
     private const ulong FirstLinkAddress = BaseAddress + 0x1000;
     private const ulong SecondLinkAddress = BaseAddress + 0x2000;
     private const ulong WaitLabelAddress = BaseAddress + 0x3000;
+    private const ulong MultiAddressArray = BaseAddress + 0x3800;
+    private const ulong MultiSizeArray = BaseAddress + 0x3810;
+    private const ulong MultiCommandAddress = BaseAddress + 0x3820;
 
     // Graphics-queue completions land on ident 0, so its absence is how a suspended
     // queue is observed without standing up a GPU backend.
@@ -132,6 +137,38 @@ public sealed class AgcCommandBufferChainTests
         finally
         {
             DeleteEqueue(ctx, equeue);
+        }
+    }
+
+    [Fact]
+    public void SubmitMultiDcbs_AttachesGuestMemoryForGpuBufferWriteback()
+    {
+        var memory = new FakeCpuMemory(BaseAddress, MemorySize);
+        var ctx = new CpuContext(memory, Generation.Gen5);
+        WriteUInt64(memory, MultiAddressArray, MultiCommandAddress);
+        WriteUInt32(memory, MultiSizeArray, 1);
+        WriteUInt32(memory, MultiCommandAddress, 0);
+
+        var guestMemoryField = typeof(VulkanVideoPresenter).GetField(
+            "_guestMemory",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(guestMemoryField);
+        var previousMemory = guestMemoryField.GetValue(null);
+        try
+        {
+            guestMemoryField.SetValue(null, null);
+            ctx[CpuRegister.Rdi] = MultiAddressArray;
+            ctx[CpuRegister.Rsi] = MultiSizeArray;
+            ctx[CpuRegister.Rdx] = 1;
+
+            Assert.Equal(
+                (int)OrbisGen2Result.ORBIS_GEN2_OK,
+                AgcExports.DriverSubmitMultiDcbs(ctx));
+            Assert.Same(memory, guestMemoryField.GetValue(null));
+        }
+        finally
+        {
+            guestMemoryField.SetValue(null, previousMemory);
         }
     }
 
