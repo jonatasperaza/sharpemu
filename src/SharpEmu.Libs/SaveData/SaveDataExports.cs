@@ -68,7 +68,8 @@ public static class SaveDataExports
     }
 
     // Additional error codes and the async-event model (see sceSaveDataGetEventResult).
-    private const int OrbisSaveDataErrorBusy = unchecked((int)0x809F0006);
+    private const int OrbisSaveDataErrorBusy = unchecked((int)0x809F0003);
+    private const int OrbisSaveDataErrorFingerprintMismatch = unchecked((int)0x809F0006);
     private const int OrbisSaveDataErrorNoEvent = unchecked((int)0x809F0008); // NOT_FOUND: no pending event
     private const int OrbisSaveDataErrorBadMounted = unchecked((int)0x809F0013);
     // SceSaveDataEventType
