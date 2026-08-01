@@ -196,6 +196,82 @@ internal sealed record GuestRenderTarget(
     uint NumberType,
     uint MipLevels = 1);
 
+/// <summary>
+/// Plans host passes for guest MRT draws. Vulkan and Metal require every color
+/// attachment in a render pass to share a usable render area, while Gen5 can
+/// bind color targets with independent extents. Such draws are replayed once
+/// per target, with a single fragment output in each host pass.
+/// </summary>
+internal static class GuestMrtPassPlanner
+{
+    public static bool RequiresSeparatePasses(IReadOnlyList<GuestRenderTarget> targets)
+    {
+        if (targets.Count < 2)
+        {
+            return false;
+        }
+
+        var width = targets[0].Width;
+        var height = targets[0].Height;
+        for (var index = 1; index < targets.Count; index++)
+        {
+            if (targets[index].Width != width || targets[index].Height != height)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Shared snapshots are consumed in queue order. Non-final passes borrow
+    /// the backing arrays; only the final pass returns them to GuestDataPool.
+    /// </summary>
+    public static IReadOnlyList<GuestMemoryBuffer> BorrowMemoryBuffers(
+        IReadOnlyList<GuestMemoryBuffer> buffers) =>
+        buffers.Select(static buffer => buffer.Pooled
+            ? buffer with { Pooled = false }
+            : buffer).ToArray();
+
+    public static IReadOnlyList<GuestVertexBuffer> BorrowVertexBuffers(
+        IReadOnlyList<GuestVertexBuffer> buffers) =>
+        buffers.Select(static buffer => buffer.Pooled
+            ? buffer with { Pooled = false }
+            : buffer).ToArray();
+
+    public static GuestIndexBuffer? BorrowIndexBuffer(GuestIndexBuffer? buffer) =>
+        buffer is { Pooled: true } ? buffer with { Pooled = false } : buffer;
+
+    /// <summary>
+    /// Preserve one guest depth operation while color output is replayed.
+    /// Before a normal depth-writing final pass, earlier color passes test but
+    /// do not update depth. A DB clear is performed by the first pass only;
+    /// color passes themselves are depth-independent for that operation.
+    /// </summary>
+    public static GuestDepthState GetDepthStateForPass(
+        GuestDepthState depth,
+        int passIndex,
+        int passCount)
+    {
+        if (passCount < 2)
+        {
+            return depth;
+        }
+
+        if (depth.ClearEnable)
+        {
+            return passIndex == 0
+                ? depth
+                : GuestDepthState.Default;
+        }
+
+        return depth.WriteEnable && passIndex < passCount - 1
+            ? depth with { WriteEnable = false }
+            : depth;
+    }
+}
+
 /// <summary>Guest DB surface bound alongside a color render target.</summary>
 internal sealed record GuestDepthTarget(
     ulong ReadAddress,

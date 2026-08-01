@@ -334,6 +334,7 @@ public static partial class AgcExports
     private static long _dcbWaitRegMemTraceCount;
     private static long _createShaderTraceCount;
     private static long _duplicateTargetTraceCount;
+    private static long _splitMrtTraceCount;
     private static long _cbMetadataSkipTraceCount;
     private static long _packetPayloadTraceCount;
     private static bool _tracedMissingPixelShaderBindings;
@@ -512,7 +513,9 @@ public static partial class AgcExports
         float ClearRed = 0f,
         float ClearGreen = 0f,
         float ClearBlue = 0f,
-        float ClearAlpha = 1f);
+        float ClearAlpha = 1f,
+        IReadOnlyList<IGuestCompiledShader>? PerTargetPixelShaders = null,
+        IReadOnlyList<GuestRenderState>? PerTargetRenderStates = null);
 
     private sealed record TranslatedImageBinding(
         TextureDescriptor Descriptor,
@@ -6871,14 +6874,6 @@ public static partial class AgcExports
                 // secondary target made deferred G-buffer draws allocate
                 // hundreds of MiB per second on the managed large-object heap.
                 var drawRenderTargets = translatedDraw.RenderTargets;
-                var lastTargetIndex = 0;
-                for (var targetIndex = 1; targetIndex < drawRenderTargets.Count; targetIndex++)
-                {
-                    if (drawRenderTargets[targetIndex].Address != 0)
-                    {
-                        lastTargetIndex = targetIndex;
-                    }
-                }
 
                 var sharedTextures = CreateGuestDrawTextures(
                     ctx,
@@ -6905,13 +6900,84 @@ public static partial class AgcExports
 
                 if (translatedDraw.IsFullscreenColorClear)
                 {
-                    VulkanVideoPresenter.SubmitOffscreenColorClear(
-                        translatedDraw.GuestTargets,
-                        translatedDraw.ClearRed,
-                        translatedDraw.ClearGreen,
-                        translatedDraw.ClearBlue,
-                        translatedDraw.ClearAlpha,
-                        translatedDraw.PixelShaderAddress);
+                    if (GuestMrtPassPlanner.RequiresSeparatePasses(translatedDraw.GuestTargets))
+                    {
+                        foreach (var target in translatedDraw.GuestTargets)
+                        {
+                            VulkanVideoPresenter.SubmitOffscreenColorClear(
+                                [target],
+                                translatedDraw.ClearRed,
+                                translatedDraw.ClearGreen,
+                                translatedDraw.ClearBlue,
+                                translatedDraw.ClearAlpha,
+                                translatedDraw.PixelShaderAddress);
+                        }
+                    }
+                    else
+                    {
+                        VulkanVideoPresenter.SubmitOffscreenColorClear(
+                            translatedDraw.GuestTargets,
+                            translatedDraw.ClearRed,
+                            translatedDraw.ClearGreen,
+                            translatedDraw.ClearBlue,
+                            translatedDraw.ClearAlpha,
+                            translatedDraw.PixelShaderAddress);
+                    }
+                }
+                else if (translatedDraw.PerTargetPixelShaders is { } perTargetShaders &&
+                         translatedDraw.PerTargetRenderStates is { } perTargetStates &&
+                         perTargetShaders.Count == translatedDraw.GuestTargets.Count &&
+                         perTargetStates.Count == translatedDraw.GuestTargets.Count)
+                {
+                    var passCount = translatedDraw.GuestTargets.Count;
+                    var splitCount = Interlocked.Increment(ref _splitMrtTraceCount);
+                    if (splitCount <= 16 || splitCount % 200 == 0)
+                    {
+                        Console.Error.WriteLine(
+                            $"[LOADER][TRACE] agc.mrt_split#{splitCount} " +
+                            $"passes={passCount} ps=0x{translatedDraw.PixelShaderAddress:X16} " +
+                            string.Join(' ', translatedDraw.GuestTargets.Select(static target =>
+                                $"0x{target.Address:X}:{target.Width}x{target.Height}:" +
+                                $"f{target.Format}/{target.NumberType}")));
+                    }
+
+                    for (var passIndex = 0; passIndex < passCount; passIndex++)
+                    {
+                        var ownsPooledData = passIndex == passCount - 1;
+                        var passGlobalMemoryBuffers = ownsPooledData
+                            ? sharedGlobalMemoryBuffers
+                            : GuestMrtPassPlanner.BorrowMemoryBuffers(sharedGlobalMemoryBuffers);
+                        var passVertexBuffers = ownsPooledData
+                            ? sharedVertexBuffers
+                            : GuestMrtPassPlanner.BorrowVertexBuffers(sharedVertexBuffers);
+                        var passIndexBuffer = ownsPooledData
+                            ? translatedDraw.IndexBuffer
+                            : GuestMrtPassPlanner.BorrowIndexBuffer(translatedDraw.IndexBuffer);
+                        var passRenderState = perTargetStates[passIndex] with
+                        {
+                            Depth = GuestMrtPassPlanner.GetDepthStateForPass(
+                                perTargetStates[passIndex].Depth,
+                                passIndex,
+                                passCount),
+                        };
+
+                        GuestGpu.Current.SubmitOffscreenTranslatedDraw(
+                            perTargetShaders[passIndex],
+                            sharedTextures,
+                            passGlobalMemoryBuffers,
+                            translatedDraw.AttributeCount,
+                            [translatedDraw.GuestTargets[passIndex]],
+                            translatedDraw.VertexShader,
+                            translatedDraw.VertexCount,
+                            translatedDraw.InstanceCount,
+                            translatedDraw.PrimitiveType,
+                            passIndexBuffer,
+                            passVertexBuffers,
+                            passRenderState,
+                            translatedDraw.DepthTarget,
+                            translatedDraw.PixelShaderAddress,
+                            translatedDraw.BaseVertex);
+                    }
                 }
                 else
                 {
@@ -7563,6 +7629,18 @@ public static partial class AgcExports
             }
         }
 
+        var guestTargets = new GuestRenderTarget[renderTargets.Length];
+        for (var index = 0; index < renderTargets.Length; index++)
+        {
+            guestTargets[index] = new GuestRenderTarget(
+                renderTargets[index].Address,
+                renderTargets[index].Width,
+                renderTargets[index].Height,
+                renderTargets[index].Format,
+                renderTargets[index].NumberType);
+        }
+        var splitMrtPasses = GuestMrtPassPlanner.RequiresSeparatePasses(guestTargets);
+
         // Exact packed encoding of the output layout — guest slot (6 bits, CB targets are
         // 0-7) plus output kind (2 bits) per target, host locations being the sequential
         // byte positions. Replaces a per-draw LINQ + string build that allocated on every
@@ -7716,6 +7794,64 @@ public static partial class AgcExports
         }
 
         var useFixedFullscreenClear = usedFixedFullscreenClear;
+        IGuestCompiledShader[]? perTargetPixelShaders = null;
+        if (splitMrtPasses && !useFixedFullscreenClear)
+        {
+            perTargetPixelShaders = new IGuestCompiledShader[renderTargets.Length];
+            for (var index = 0; index < renderTargets.Length; index++)
+            {
+                var target = renderTargets[index];
+                var targetOutputLayout = (ulong)(
+                    ((target.Slot & 0x3Fu) << 2) |
+                    (uint)renderTargetOutputKinds[index]);
+                var targetShaderKey = (
+                    exportShaderAddress,
+                    exportStateFingerprint,
+                    pixelShaderAddress,
+                    pixelStateFingerprint,
+                    targetOutputLayout,
+                    1u,
+                    attributeCount,
+                    psInputEna,
+                    psInputAddr,
+                    psInputCntlFingerprint,
+                    _storageBufferOffsetAlignment);
+                _graphicsShaderCache.TryGetValue(targetShaderKey, out var targetCompiled);
+                if (targetCompiled.Pixel is null)
+                {
+                    var targetOutput = new Gen5PixelOutputBinding(
+                        target.Slot,
+                        HostLocation: 0,
+                        renderTargetOutputKinds[index]);
+                    if (!GuestGpu.Current.TryCompilePixelShader(
+                            pixelState,
+                            pixelEvaluation,
+                            [targetOutput],
+                            out var targetPixelShader,
+                            out error,
+                            globalBufferBase: 0,
+                            totalGlobalBufferCount: totalGlobalBuffers,
+                            imageBindingBase: 0,
+                            scalarRegisterBufferIndex: _bakeScalars ? -1 : guestGlobalBuffers,
+                            pixelInputEnable: psInputEna,
+                            pixelInputAddress: psInputAddr,
+                            pixelInputCntl: psInputCntl,
+                            storageBufferOffsetAlignment:
+                                _storageBufferOffsetAlignment))
+                    {
+                        ReturnPooledEvaluationArrays(exportEvaluation);
+                        ReturnPooledEvaluationArrays(pixelEvaluation);
+                        return false;
+                    }
+
+                    targetCompiled = (compiled.Vertex, targetPixelShader!);
+                    GuestGpu.Current.CountShaderCompilation();
+                    _graphicsShaderCache.TryAdd(targetShaderKey, targetCompiled);
+                }
+
+                perTargetPixelShaders[index] = targetCompiled.Pixel;
+            }
+        }
 
         List<TranslatedImageBinding> textures;
         Gen5GlobalMemoryBinding[] globalMemoryBindings;
@@ -7771,22 +7907,34 @@ public static partial class AgcExports
         }
 
         state.UcRegisters.TryGetValue(VgtPrimitiveType, out var primitiveType);
-        var guestTargets = new GuestRenderTarget[renderTargets.Length];
-        for (var index = 0; index < renderTargets.Length; index++)
-        {
-            guestTargets[index] = new GuestRenderTarget(
-                renderTargets[index].Address,
-                renderTargets[index].Width,
-                renderTargets[index].Height,
-                renderTargets[index].Format,
-                renderTargets[index].NumberType);
-        }
 
         var pixelUserDataCount = Math.Min(pixelEvaluation.InitialScalarRegisters.Count, 8);
         var pixelUserData = new uint[pixelUserDataCount];
         for (var index = 0; index < pixelUserDataCount; index++)
         {
             pixelUserData[index] = pixelEvaluation.InitialScalarRegisters[index];
+        }
+
+        var renderState = ApplyTransparentPremultipliedFillClear(
+            CreateRenderState(state.CxRegisters, renderTargets, pixelColorExportMasks),
+            textures,
+            vertexInputs,
+            pixelEvaluation.InitialScalarRegisters);
+        GuestRenderState[]? perTargetRenderStates = null;
+        if (splitMrtPasses)
+        {
+            perTargetRenderStates = new GuestRenderState[renderTargets.Length];
+            for (var index = 0; index < renderTargets.Length; index++)
+            {
+                perTargetRenderStates[index] = ApplyTransparentPremultipliedFillClear(
+                    CreateRenderState(
+                        state.CxRegisters,
+                        [renderTargets[index]],
+                        pixelColorExportMasks),
+                    textures,
+                    vertexInputs,
+                    pixelEvaluation.InitialScalarRegisters);
+            }
         }
 
         draw = new TranslatedGuestDraw(
@@ -7806,11 +7954,7 @@ public static partial class AgcExports
             renderTargets,
             DecodeDepthTarget(state.CxRegisters),
             guestTargets,
-            ApplyTransparentPremultipliedFillClear(
-                CreateRenderState(state.CxRegisters, renderTargets, pixelColorExportMasks),
-                textures,
-                vertexInputs,
-                pixelEvaluation.InitialScalarRegisters),
+            renderState,
             pixelUserData,
             state.CxRegisters.TryGetValue(CbBlend0Control, out var rawBlend) ? rawBlend : 0,
             state.CxRegisters.TryGetValue(
@@ -7824,7 +7968,9 @@ public static partial class AgcExports
             fullscreenClearColor.Red,
             fullscreenClearColor.Green,
             fullscreenClearColor.Blue,
-            fullscreenClearColor.Alpha);
+            fullscreenClearColor.Alpha,
+            perTargetPixelShaders,
+            perTargetRenderStates);
         return true;
     }
 
