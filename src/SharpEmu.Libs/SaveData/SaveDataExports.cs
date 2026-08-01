@@ -790,66 +790,108 @@ public static class SaveDataExports
             }
 
             string? mountPoint = null;
+            var createdMountRegistration = false;
+            var reusedExistingMount = false;
+            
             lock (_mountGate)
             {
-                if (_mounts.Values.Any(
-                    entry => string.Equals(
-                        entry.SlotDir,
+                var existingMount = _mounts.FirstOrDefault(
+                    pair => string.Equals(
+                        pair.Value.SlotDir,
                         savePath,
-                        StringComparison.OrdinalIgnoreCase)))
+                        StringComparison.OrdinalIgnoreCase));
+            
+                if (!string.IsNullOrEmpty(existingMount.Key))
                 {
+                    mountPoint = existingMount.Key;
+                    reusedExistingMount = true;
+            
                     TraceSaveData(
-                        $"mount_busy reason=duplicate_path " +
-                        $"requested='{savePath}' active_mounts={_mounts.Count}");
-                
-                    return SetReturn(ctx, OrbisSaveDataErrorBusy);
+                        $"mount_reuse requested='{savePath}' " +
+                        $"mount_point={mountPoint} " +
+                        $"active_mounts={_mounts.Count}");
                 }
-
-                for (var slot = 0; slot < MountSlotCount; slot++)
+                else
                 {
-                    var candidate = $"/savedata{slot}";
-                    if (!_mounts.ContainsKey(candidate))
+                    for (var slot = 0; slot < MountSlotCount; slot++)
                     {
-                        mountPoint = candidate;
-                        break;
+                        var candidate = $"/savedata{slot}";
+            
+                        if (!_mounts.ContainsKey(candidate))
+                        {
+                            mountPoint = candidate;
+                            break;
+                        }
                     }
+            
+                    if (mountPoint is null)
+                    {
+                        TraceSaveData(
+                            $"mount_busy reason=no_free_slot " +
+                            $"requested='{savePath}' " +
+                            $"active_mounts={_mounts.Count}");
+            
+                        return SetReturn(ctx, OrbisSaveDataErrorBusy);
+                    }
+            
+                    KernelMemoryCompatExports.RegisterGuestPathMount(
+                        mountPoint,
+                        savePath);
+            
+                    _mounts.Add(
+                        mountPoint,
+                        new MountEntry(savePath, dirName, userId));
+            
+                    createdMountRegistration = true;
                 }
-
-                if (mountPoint is null)
-                {
-                    TraceSaveData(
-                        $"mount_busy reason=no_free_slot " +
-                        $"requested='{savePath}' active_mounts={_mounts.Count}");
-                
-                    return SetReturn(ctx, OrbisSaveDataErrorBusy);
-                }
-
-                KernelMemoryCompatExports.RegisterGuestPathMount(mountPoint, savePath);
-                _mounts.Add(mountPoint, new MountEntry(savePath, dirName, userId));
             }
-
+            
+            var resolvedMountPoint = mountPoint!;
+            
             Span<byte> result = stackalloc byte[MountResultSize];
             result.Clear();
-            WriteAscii(result[..16], mountPoint);
-            BinaryPrimitives.WriteUInt32LittleEndian(result[0x1C..], createIfMissing && !existed ? 1u : 0u);
+            
+            WriteAscii(result[..16], resolvedMountPoint);
+            
+            BinaryPrimitives.WriteUInt32LittleEndian(
+                result[0x1C..],
+                createIfMissing && !existed ? 1u : 0u);
+            
             if (!ctx.Memory.TryWrite(resultAddress, result))
             {
-                lock (_mountGate)
+                // Nunca remova um mount antigo apenas porque a escrita do
+                // resultado de uma tentativa duplicada falhou.
+                if (createdMountRegistration)
                 {
-                    var removed = _mounts.Remove(mountPoint);
-                
+                    bool removed;
+            
+                    lock (_mountGate)
+                    {
+                        removed = _mounts.Remove(resolvedMountPoint);
+                    }
+            
                     TraceSaveData(
-                        $"umount2 mount='{mountPoint}' " +
-                        $"removed={removed} remaining={_mounts.Count}");
+                        $"mount_rollback mount='{resolvedMountPoint}' " +
+                        $"removed={removed}");
+            
+                    KernelMemoryCompatExports.UnregisterGuestPathMount(
+                        resolvedMountPoint);
                 }
-                KernelMemoryCompatExports.UnregisterGuestPathMount(mountPoint);
-                return SetReturn(ctx, (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
+            
+                return SetReturn(
+                    ctx,
+                    (int)OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
             }
-
+            
             TraceSaveData(
-                $"{operation} user={userId} title={sanitizedTitleId} dir={dirName} blocks={blocks} " +
-                $"system_blocks={systemBlocks} mount_mode=0x{mountMode:X} resource={resource} mode={mode} " +
-                $"mount_point={mountPoint} created={!existed} root='{savePath}'");
+                $"{operation} user={userId} title={sanitizedTitleId} " +
+                $"dir={dirName} blocks={blocks} " +
+                $"system_blocks={systemBlocks} " +
+                $"mount_mode=0x{mountMode:X} resource={resource} mode={mode} " +
+                $"mount_point={resolvedMountPoint} " +
+                $"created={!existed} reused={reusedExistingMount} " +
+                $"root='{savePath}'");
+            
             return SetReturn(ctx, 0);
         }
         catch (IOException)
