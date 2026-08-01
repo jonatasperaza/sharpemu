@@ -11,7 +11,7 @@ using SharpEmu.HLE;
 
 namespace SharpEmu.Core.Cpu;
 
-public sealed class CpuDispatcher : ICpuDispatcher, IDisposable
+public sealed class CpuDispatcher : ICpuDispatcher, IExecutableRegionPreparer, IDisposable
 {
     private enum EntryFrameKind
     {
@@ -79,6 +79,15 @@ public sealed class CpuDispatcher : ICpuDispatcher, IDisposable
     public string? LastRecentControlTransferTrace { get; private set; }
 
     public CpuSessionSummary LastSessionSummary { get; private set; }
+
+    void IExecutableRegionPreparer.PrepareExecutableRegions(IReadOnlyList<ulong> entryPoints)
+    {
+        _nativeCpuBackend ??= new DirectExecutionBackend(_moduleManager);
+        if (_nativeCpuBackend is DirectExecutionBackend directExecutionBackend)
+        {
+            directExecutionBackend.PrepareExecutableRegions(_virtualMemory, entryPoints);
+        }
+    }
 
     public OrbisGen2Result DispatchEntry(
         ulong entryPoint,

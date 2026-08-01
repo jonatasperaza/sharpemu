@@ -162,6 +162,18 @@ public sealed class SharpEmuRuntime : ISharpEmuRuntime
         MergeKnownHleDataSymbols(activeRuntimeSymbols);
         var loadedModuleImages = LoadAdjacentSceModules(ebootPath, activeImportStubs, activeRuntimeSymbols);
         RebindImportedDataSymbols(image, loadedModuleImages, activeRuntimeSymbols);
+        // Module initializers can call into the main executable or another
+        // preloaded module. Prepare every loaded image before running any
+        // guest code so cross-image TLS accesses are safe from the start.
+        if (_cpuDispatcher is IExecutableRegionPreparer executableRegionPreparer)
+        {
+            var executableEntryPoints = new List<ulong>(loadedModuleImages.Count + 1)
+            {
+                image.EntryPoint,
+            };
+            executableEntryPoints.AddRange(loadedModuleImages.Select(module => module.Image.EntryPoint));
+            executableRegionPreparer.PrepareExecutableRegions(executableEntryPoints);
+        }
         var initializerResult = RunAllInitializers(
             image,
             loadedModuleImages,

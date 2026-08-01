@@ -191,6 +191,12 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 
 	private nint _tlsHandlerAddress;
 
+	private readonly List<nint> _tlsHandlerAddresses = new();
+
+	private readonly HashSet<(ulong Start, ulong End)> _preparedTlsRanges = new();
+
+	private readonly object _tlsPreparationGate = new();
+
 	private nint _tlsBaseAddress;
 
 	private nint _ownedTlsBaseAddress;
@@ -1218,8 +1224,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 				result = OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT;
 				return false;
 			}
-			CreateTlsHandler();
-			PatchTlsPatterns();
+			EnsureExecutableRegionPrepared(context, entryPoint);
 			return ExecuteEntry(context, entryPoint, out result);
 		}
 		catch (Exception ex)
@@ -2319,6 +2324,7 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		{
 			throw new OutOfMemoryException("Failed to allocate TLS handler");
 		}
+		_tlsHandlerAddresses.Add(_tlsHandlerAddress);
 		// The handler runs in place of a patched guest `mov reg, fs:[0]`,
 		// which preserves every register and the flags. TlsGetValue (and the
 		// Win64 ABI in general) clobbers rcx/rdx/r8-r11 and the arithmetic
@@ -3140,11 +3146,72 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 		return true;
 	}
 
+	internal void PrepareExecutableRegions(
+		IVirtualMemory virtualMemory,
+		IReadOnlyList<ulong> entryPoints)
+	{
+		ArgumentNullException.ThrowIfNull(virtualMemory);
+		ArgumentNullException.ThrowIfNull(entryPoints);
+
+		var ranges = GetExecutableScanRanges(virtualMemory.SnapshotRegions(), entryPoints);
+		foreach (var (start, end) in ranges)
+		{
+			EnsureExecutableRegionPrepared(start, end);
+		}
+
+		Console.Error.WriteLine($"[LOADER][INFO] Prepared {ranges.Count} executable regions for cross-image TLS access");
+	}
+
+	private void EnsureExecutableRegionPrepared(CpuContext context, ulong entryPoint)
+	{
+		if (TryGetVirtualMemory(context, out var virtualMemory) &&
+			TryGetExecutableScanRange(
+				virtualMemory.SnapshotRegions(),
+				entryPoint,
+				out var regionStart,
+				out var regionEnd))
+		{
+			EnsureExecutableRegionPrepared(regionStart, regionEnd);
+			return;
+		}
+
+		CreateTlsHandler();
+		PatchTlsPatterns();
+	}
+
+	private void EnsureExecutableRegionPrepared(ulong regionStart, ulong regionEnd)
+	{
+		lock (_tlsPreparationGate)
+		{
+			if (!_preparedTlsRanges.Add((regionStart, regionEnd)))
+			{
+				return;
+			}
+
+			var previousEntryPoint = _entryPoint;
+			try
+			{
+				_entryPoint = regionStart;
+				CreateTlsHandler();
+				PatchTlsPatterns(regionStart, regionEnd);
+			}
+			catch
+			{
+				_preparedTlsRanges.Remove((regionStart, regionEnd));
+				throw;
+			}
+			finally
+			{
+				_entryPoint = previousEntryPoint;
+			}
+		}
+	}
+
 	private unsafe void PatchTlsPatterns()
 	{
 		// Scan the complete executable mapping that contains the current entry
 		// point. Large Gen5 images can place valid TLS accesses beyond an
-		// arbitrary fixed window (Minecraft reaches one near +0xB78D700).
+		// arbitrary fixed window.
 		const ulong FallbackMaxScanBytes = 134217728uL;
 		ulong num = _entryPoint;
 		ulong num2 = _entryPoint > ulong.MaxValue - FallbackMaxScanBytes
@@ -3161,6 +3228,11 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 			num = regionStart;
 			num2 = regionEnd;
 		}
+		PatchTlsPatterns(num, num2);
+	}
+
+	private unsafe void PatchTlsPatterns(ulong num, ulong num2)
+	{
 		int num3 = 0;
 		int num4 = 0;
 		int num9 = 0;
@@ -3210,6 +3282,27 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 			num = num6 > num ? num6 : num + 4096uL;
 		}
 		Console.Error.WriteLine($"[LOADER][INFO] Patched {num3} TLS loads, {num9} TLS stores, {num4} stack-canary accesses, {sse4aPatchCount} SSE4a EXTRQ blends");
+	}
+
+	internal static IReadOnlyList<(ulong Start, ulong End)> GetExecutableScanRanges(
+		IReadOnlyList<VirtualMemoryRegion> regions,
+		IReadOnlyList<ulong> entryPoints)
+	{
+		var ranges = new List<(ulong Start, ulong End)>();
+		var seen = new HashSet<(ulong Start, ulong End)>();
+		foreach (var entryPoint in entryPoints)
+		{
+			if (!TryGetExecutableScanRange(regions, entryPoint, out var start, out var end) ||
+				end - start <= MinTlsPatchInstructionBytes ||
+				!seen.Add((start, end)))
+			{
+				continue;
+			}
+
+			ranges.Add((start, end));
+		}
+
+		return ranges;
 	}
 
 	internal static bool TryGetExecutableScanRange(
@@ -7125,11 +7218,16 @@ public sealed unsafe partial class DirectExecutionBackend : INativeCpuBackend, I
 			}
 			_tlsModuleBases.Clear();
 		}
-		if (_tlsHandlerAddress != 0)
+		foreach (var tlsHandlerAddress in _tlsHandlerAddresses)
 		{
-			VirtualFree((void*)_tlsHandlerAddress, 0u, 32768u);
-			_tlsHandlerAddress = 0;
+			if (tlsHandlerAddress != 0)
+			{
+				VirtualFree((void*)tlsHandlerAddress, 0u, 32768u);
+			}
 		}
+		_tlsHandlerAddresses.Clear();
+		_preparedTlsRanges.Clear();
+		_tlsHandlerAddress = 0;
 		if (_hostRspSlotStorage != 0)
 		{
 			VirtualFree((void*)_hostRspSlotStorage, 0u, 32768u);

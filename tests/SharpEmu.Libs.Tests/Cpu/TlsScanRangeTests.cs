@@ -56,4 +56,46 @@ public sealed class TlsScanRangeTests
             out _,
             out _));
     }
+
+    [Fact]
+    public void ReturnsEveryExecutableRegionForCrossImageCalls()
+    {
+        VirtualMemoryRegion[] regions =
+        [
+            new(
+                virtualAddress: 0x0000_0008_0000_0000,
+                memorySize: 0x1000,
+                fileOffset: 0,
+                fileSize: 0x1000,
+                ProgramHeaderFlags.Read | ProgramHeaderFlags.Execute),
+            new(
+                virtualAddress: 0x0000_0008_1000_0000,
+                memorySize: 0x2000,
+                fileOffset: 0,
+                fileSize: 0x2000,
+                ProgramHeaderFlags.Read),
+            new(
+                virtualAddress: 0x0000_0010_0000_0000,
+                memorySize: 0x3000,
+                fileOffset: 0,
+                fileSize: 0x3000,
+                ProgramHeaderFlags.Read | ProgramHeaderFlags.Execute),
+        ];
+
+        ulong[] entryPoints =
+        [
+            0x0000_0008_0000_0080,
+            0x0000_0010_0000_0100,
+            0x0000_0008_0000_0200,
+        ];
+
+        var ranges = DirectExecutionBackend.GetExecutableScanRanges(regions, entryPoints);
+
+        Assert.Equal(
+            [
+                (0x0000_0008_0000_0000UL, 0x0000_0008_0000_1000UL),
+                (0x0000_0010_0000_0000UL, 0x0000_0010_0000_3000UL),
+            ],
+            ranges);
+    }
 }
