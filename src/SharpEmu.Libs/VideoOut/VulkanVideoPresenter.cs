@@ -5825,6 +5825,25 @@ internal static unsafe class VulkanVideoPresenter
                 snapshot.Initialized = true;
                 _guestImageVersions.Add(work.Version, snapshot);
                 _capturedGuestFlipVersions.Add(work.Version);
+                var flipTraceIndex =
+                    Interlocked.Increment(ref _flipCaptureSuccessTraceCount);
+                
+                if (flipTraceIndex <= 200 || flipTraceIndex % 1000 == 0)
+                {
+                    Console.Error.WriteLine(
+                        $"[LOADER][TRACE] vk.flip_capture_success#{flipTraceIndex} " +
+                        $"version={work.Version} " +
+                        $"addr=0x{work.Address:X16} " +
+                        $"handle={work.VideoOutHandle} " +
+                        $"index={work.DisplayBufferIndex} " +
+                        $"work_size={work.Width}x{work.Height} " +
+                        $"pitch={work.PitchInPixel} " +
+                        $"source_addr=0x{source.Address:X16} " +
+                        $"source_size={source.Width}x{source.Height} " +
+                        $"source_format={source.Format} " +
+                        $"snapshot_addr=0x{snapshot.Address:X16} " +
+                        $"snapshot_size={snapshot.Width}x{snapshot.Height}");
+                }
 
                 lock (_gate)
                 {
@@ -5898,6 +5917,9 @@ internal static unsafe class VulkanVideoPresenter
         }
 
         private bool _loggedFlipWaitOrderViolation;
+        
+        private int _flipCaptureSuccessTraceCount;
+        private int _presentResolveTraceCount;
 
         private GuestImageResource CreateGuestFlipSnapshot(
             GuestImageResource source,
@@ -15133,6 +15155,34 @@ internal static unsafe class VulkanVideoPresenter
                 _guestImages.TryGetValue(
                     presentation.GuestImageAddress,
                     out presentedGuestImage);
+            }
+            var presentTraceIndex =
+                Interlocked.Increment(ref _presentResolveTraceCount);
+            
+            if (presentTraceIndex <= 200 || presentTraceIndex % 1000 == 0)
+            {
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.present_resolve#{presentTraceIndex} " +
+                    $"sequence={presentation.Sequence} " +
+                    $"requested_addr=0x{presentation.GuestImageAddress:X16} " +
+                    $"requested_version={presentation.GuestImageVersion} " +
+                    $"owns_version={ownsPresentedGuestImageVersion} " +
+                    $"resolved={(presentedGuestImage is not null)} " +
+                    $"initialized={(presentedGuestImage?.Initialized ?? false)} " +
+                    $"resolved_addr=" +
+                    (presentedGuestImage is null
+                        ? "<null> "
+                        : $"0x{presentedGuestImage.Address:X16} ") +
+                    $"resolved_size=" +
+                    (presentedGuestImage is null
+                        ? "<null> "
+                        : $"{presentedGuestImage.Width}x{presentedGuestImage.Height} ") +
+                    $"resolved_format=" +
+                    (presentedGuestImage is null
+                        ? "<null> "
+                        : $"{presentedGuestImage.Format} ") +
+                    $"pixels={(presentation.Pixels is not null)} " +
+                    $"translated={(presentation.TranslatedDraw is not null)}");
             }
 
             if (presentation.GuestImageAddress != 0 &&
