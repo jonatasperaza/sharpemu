@@ -143,6 +143,17 @@ public static partial class AgcExports
     private const uint CbColor0Attrib2 = 0x3B0;
     private const uint CbColor0Attrib3 = 0x3B8;
     private const uint CbBlend0Control = 0x1E0;
+    private const uint VirtualContextRegisterBase = 0x10000000;
+    private static readonly uint[] ColorTargetRegisterLayout =
+    [
+        0x318, 0x31B, 0x31C, 0x31D, 0x31E, 0x31F, 0x321, 0x323,
+        0x324, 0x325, 0x390, 0x398, 0x3A0, 0x3A8, 0x3B0, 0x3B8,
+    ];
+    private static readonly uint[] DepthTargetRegisterLayout =
+    [
+        0x010, 0x011, 0x012, 0x013, 0x014, 0x015, 0x01A, 0x01B,
+        0x01C, 0x01D, 0x01E, 0x002, 0x005, 0x007, 0x00B, 0x00A,
+    ];
     private const uint PaScModeCntl0 = 0x292;
     // GFX10 DB context registers (register byte address minus 0x28000, / 4).
     private const uint DbRenderControl = 0x000;
@@ -1196,6 +1207,16 @@ public static partial class AgcExports
         ctx[CpuRegister.Rax] = 0;
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
     }
+
+    // Newer AGC SDKs import the catalogued NID while some shipped titles use
+    // the captured compatibility NID above. Both names describe the same ABI.
+    [SysAbiExport(
+        Nid = "dbOlWdppb4o",
+        ExportName = "sceAgcCreateInterpolantMapping",
+        Target = Generation.Gen5,
+        LibraryName = "libSceAgc")]
+    public static int CreateInterpolantMappingSdkAlias(CpuContext ctx) =>
+        CreateInterpolantMapping(ctx);
     #pragma warning restore SHEM004
 
     private static uint ApplyInterpolantDefaultValue(uint value, uint psWord)
@@ -6414,9 +6435,13 @@ public static partial class AgcExports
                 return;
             }
 
-            var registerOffset = DecodeIndirectRegisterOffset(
-                encodedRegister,
-                register == RCxRegsIndirect);
+            if (!TryDecodeIndirectRegisterOffset(
+                    encodedRegister,
+                    register == RCxRegsIndirect,
+                    out var registerOffset))
+            {
+                continue;
+            }
             // The indirect table has an explicit count; offset zero is a real
             // context-register index (DB_RENDER_CONTROL), not a terminator.
             // Dropping it leaves stale depth/render-control state active in
@@ -6429,23 +6454,25 @@ public static partial class AgcExports
         }
     }
 
-    internal static uint DecodeIndirectRegisterOffset(
+    internal static bool TryDecodeIndirectRegisterOffset(
         uint encodedRegister,
-        bool contextRegister)
+        bool contextRegister,
+        out uint registerOffset)
     {
-        // BuildInterpolantMapping may use a virtual context-register bank.
-        // The real driver resolves 0x10000000+n to SPI_PS_INPUT_CNTL_n when
-        // it consumes the indirect array. Other register identifiers are
-        // already hardware offsets and must remain unchanged.
-        const uint virtualPsInputCntl0 = 0x10000000u;
+        registerOffset = encodedRegister;
+
+        // Virtual CX identifiers are relative to the register group that was
+        // appended to the indirect packet. AddIndirectPatchRegisters resolves
+        // the groups that SharpEmu understands while that boundary is still
+        // available. Do not reinterpret an unresolved identifier as a real
+        // hardware register: several unrelated groups share the same value.
         if (contextRegister &&
-            encodedRegister >= virtualPsInputCntl0 &&
-            encodedRegister < virtualPsInputCntl0 + 32u)
+            (encodedRegister & 0xF0000000u) == VirtualContextRegisterBase)
         {
-            return SpiPsInputCntl0 + (encodedRegister - virtualPsInputCntl0);
+            return false;
         }
 
-        return encodedRegister;
+        return true;
     }
 
     /// <summary>
@@ -8133,7 +8160,11 @@ public static partial class AgcExports
                 guestSpan,
                 hostData.AsSpan(0, hostByteCount));
             GuestDataPool.Shared.Return(guestData);
-            return new GuestIndexBuffer(hostData, hostByteCount, Is32Bit: false, Pooled: true);
+            return new GuestIndexBuffer(
+                hostData,
+                hostByteCount,
+                Is32Bit: false,
+                Pooled: true);
         }
 
         var is32Bit = indexType == AgcIndexHelpers.ProsperoIndexType.Index32;
@@ -8142,7 +8173,11 @@ public static partial class AgcExports
         if (ctx.Memory.TryRead(address, span) ||
             KernelMemoryCompatExports.TryReadTrackedLibcHeap(address, span))
         {
-            return new GuestIndexBuffer(data, guestByteCount, is32Bit, Pooled: true);
+            return new GuestIndexBuffer(
+                data,
+                guestByteCount,
+                is32Bit,
+                Pooled: true);
         }
 
         GuestDataPool.Shared.Return(data);
@@ -9050,7 +9085,9 @@ public static partial class AgcExports
                 draw.VertexInputs.Select(input =>
                     $"{input.Location}:pc=0x{input.Pc:X}:0x{input.BaseAddress:X16}" +
                     $":stride{input.Stride}:off{input.OffsetBytes}:c{input.ComponentCount}" +
-                    $":fmt{input.DataFormat}/num{input.NumberFormat}"));
+                    $":fmt{input.DataFormat}/num{input.NumberFormat}:" +
+                    Convert.ToHexString(
+                        input.Data.AsSpan(0, Math.Min(input.DataLength, 64)))));
         var scissor = draw.RenderState.Scissor is { } drawScissor
             ? $"{drawScissor.X},{drawScissor.Y},{drawScissor.Width}x{drawScissor.Height}"
             : "full";
@@ -9643,6 +9680,12 @@ public static partial class AgcExports
         var textureDepth = GetTextureVolumeDepth(
             descriptor.Type,
             descriptor.Depth);
+        var resourceArrayLayers = GetTextureArrayLayers(
+            descriptor.Type,
+            descriptor.Depth);
+        var baseArrayLayer = Math.Min(
+            descriptor.BaseArray,
+            resourceArrayLayers - 1);
         if ((descriptor.Type != Gen5TextureType1D &&
              descriptor.Type != Gen5TextureType2D &&
              descriptor.Type != Gen5TextureType3D &&
@@ -9771,14 +9814,13 @@ public static partial class AgcExports
             return true;
         }
 
-        var wantsArrayUpload = isArrayed &&
+        var wantsArrayUpload =
             !isStorage &&
             descriptor.Address != 0 &&
-            (descriptor.Type == Gen5TextureType2DArray ||
-             descriptor.Type == Gen5TextureType1DArray) &&
-            descriptor.Depth > 1 &&
+            resourceArrayLayers > 1 &&
+            (isArrayed || descriptor.Type == Gen5TextureTypeCube) &&
             !_arrayUploadUnsupported.ContainsKey(descriptor.Address);
-        var arrayUploadLayers = wantsArrayUpload ? descriptor.Depth : 1u;
+        var arrayUploadLayers = wantsArrayUpload ? resourceArrayLayers : 1u;
 
         // Upload-known (not plain availability): the presenter's answer goes
         // generation-stale when the guest CPU rewrites a CPU-backed image
@@ -9814,6 +9856,8 @@ public static partial class AgcExports
                 DstSelect: descriptor.DstSelect,
                 Sampler: ToGuestSampler(samplerDescriptor),
                 ArrayedView: isArrayed,
+                ArrayLayers: resourceArrayLayers,
+                BaseArrayLayer: baseArrayLayer,
                 Type: descriptor.Type,
                 Depth: textureDepth);
             return true;
@@ -9893,6 +9937,9 @@ public static partial class AgcExports
                 TileMode: descriptor.TileMode,
                 DstSelect: descriptor.DstSelect,
                 Sampler: ToGuestSampler(samplerDescriptor),
+                ArrayedView: isArrayed,
+                ArrayLayers: resourceArrayLayers,
+                BaseArrayLayer: baseArrayLayer,
                 Type: descriptor.Type,
                 Depth: textureDepth);
             return true;
@@ -9933,6 +9980,7 @@ public static partial class AgcExports
                     sampler,
                     isArrayed,
                     arrayUploadLayers,
+                    baseArrayLayer,
                     descriptor.Type,
                     textureDepth)))
         {
@@ -9956,6 +10004,7 @@ public static partial class AgcExports
                 Sampler: sampler,
                 ArrayedView: isArrayed,
                 ArrayLayers: arrayUploadLayers,
+                BaseArrayLayer: baseArrayLayer,
                 Type: descriptor.Type,
                 Depth: textureDepth);
             return true;
@@ -10018,8 +10067,9 @@ public static partial class AgcExports
                             DstSelect: descriptor.DstSelect,
                             Sampler: sampler,
                             WriteGeneration: hasWriteGeneration ? writeGeneration : -1,
-                            ArrayedView: true,
+                            ArrayedView: isArrayed,
                             ArrayLayers: arrayLayers,
+                            BaseArrayLayer: baseArrayLayer,
                             // Must match the identity the CPU path below ships, or
                             // the presenter caches this texture under a different
                             // key than IsTextureContentCached queries above and the
@@ -10080,8 +10130,9 @@ public static partial class AgcExports
                         TileMode: descriptor.TileMode,
                         DstSelect: descriptor.DstSelect,
                         Sampler: sampler,
-                        ArrayedView: true,
+                        ArrayedView: isArrayed,
                         ArrayLayers: arrayLayers,
+                        BaseArrayLayer: baseArrayLayer,
                         Type: descriptor.Type,
                         Depth: textureDepth);
                     return true;
@@ -10158,7 +10209,7 @@ public static partial class AgcExports
         // Arrayed textures are handled by the arrayed branch above (they package
         // every layer's tiled slice); this branch is the single-layer case.
         if (_gpuDetileEnabled && hasElementLayout && !baseMipInTail &&
-            IsGpuDetileBytesPerElement(bytesPerElement) && !isArrayed &&
+            IsGpuDetileBytesPerElement(bytesPerElement) && !wantsArrayUpload &&
             IsGpuDetileTextureType(descriptor.Type))
         {
             var gpuDetileParams = GnmTiling.GetDetileParams(
@@ -10186,6 +10237,8 @@ public static partial class AgcExports
                     Sampler: ToGuestSampler(samplerDescriptor),
                     WriteGeneration: hasWriteGeneration ? writeGeneration : -1,
                     ArrayedView: isArrayed,
+                    ArrayLayers: resourceArrayLayers,
+                    BaseArrayLayer: baseArrayLayer,
                     Type: descriptor.Type,
                     Depth: textureDepth,
                     TiledSource: source,
@@ -10222,6 +10275,8 @@ public static partial class AgcExports
             Sampler: ToGuestSampler(samplerDescriptor),
             WriteGeneration: hasWriteGeneration ? writeGeneration : -1,
             ArrayedView: isArrayed,
+            ArrayLayers: resourceArrayLayers,
+            BaseArrayLayer: baseArrayLayer,
             Type: descriptor.Type,
             Depth: textureDepth);
         return true;
@@ -11107,7 +11162,11 @@ public static partial class AgcExports
                 var globalBuffers = evaluation.GlobalMemoryBindings.Count == 0
                     ? string.Empty
                     : $" global_buffers=[{string.Join(',', evaluation.GlobalMemoryBindings.Select(
-                        binding => $"0x{binding.BaseAddress:X16}:{binding.DataLength}"))}]";
+                        binding =>
+                            $"0x{binding.BaseAddress:X16}:{binding.DataLength}:" +
+                            $"w={(binding.Writable ? 1 : 0)}/" +
+                            $"wb={(binding.WriteBackToGuest ? 1 : 0)}/" +
+                            $"pool={(binding.DataPooled ? 1 : 0)}"))}]";
                 var scalarProbe = string.Join(
                     ',',
                     evaluation.InitialScalarRegisters
@@ -11838,6 +11897,13 @@ public static partial class AgcExports
             ? Math.Max(depth, 1u)
             : 1u;
 
+    internal static uint GetTextureArrayLayers(uint type, uint depth) =>
+        type is Gen5TextureTypeCube or
+            Gen5TextureType1DArray or
+            Gen5TextureType2DArray
+            ? Math.Max(depth, 1u)
+            : 1u;
+
     private static uint GetLinearTexturePitch(uint pitch, uint height, uint format)
     {
         var bytesPerTexel = GetTextureBytesPerTexel(format);
@@ -12467,12 +12533,13 @@ public static partial class AgcExports
                 return;
             }
 
-            var registerOffset = DecodeIndirectRegisterOffset(
+            var resolved = TryDecodeIndirectRegisterOffset(
                 encodedRegister,
-                register == RCxRegsIndirect);
+                register == RCxRegsIndirect,
+                out var registerOffset);
             TraceAgc(
                 $"agc.dcb.reg space={registerSpace} index={i} " +
-                $"encoded=0x{encodedRegister:X8} offset=0x{registerOffset:X4} " +
+                $"encoded=0x{encodedRegister:X8} offset={(resolved ? $"0x{registerOffset:X4}" : "virtual")} " +
                 $"value=0x{value:X8}");
         }
 
@@ -12790,6 +12857,12 @@ public static partial class AgcExports
         }
 
         if (!TryReadUInt32(ctx, commandAddress + 4, out var currentCount) ||
+            (registerSpace == "cx" &&
+             !TryMaterializeVirtualContextRegisterGroup(
+                 ctx,
+                 commandAddress,
+                 currentCount,
+                 registerCount)) ||
             !TryWriteUInt32(ctx, commandAddress + 4, currentCount + registerCount))
         {
             return SetReturn(ctx, OrbisGen2Result.ORBIS_GEN2_ERROR_MEMORY_FAULT);
@@ -12798,6 +12871,185 @@ public static partial class AgcExports
         TraceAgc($"agc.patch_{registerSpace}_add cmd=0x{commandAddress:X16} add={registerCount} total={currentCount + registerCount}");
         ctx[CpuRegister.Rax] = 0;
         return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+    }
+
+    private static bool TryMaterializeVirtualContextRegisterGroup(
+        CpuContext ctx,
+        ulong commandAddress,
+        uint currentCount,
+        uint registerCount)
+    {
+        if (registerCount is not (1 or 16 or 19) ||
+            !TryReadUInt64(ctx, commandAddress + 8, out var registersAddress) ||
+            registersAddress == 0)
+        {
+            return true;
+        }
+
+        if (registerCount == 1)
+        {
+            return TryMaterializeBlendTargetMaskPair(ctx, registersAddress, currentCount);
+        }
+
+        Span<uint> encodedRegisters = stackalloc uint[(int)registerCount];
+        Span<uint> values = stackalloc uint[(int)registerCount];
+        for (uint index = 0; index < registerCount; index++)
+        {
+            var entryAddress = registersAddress + ((currentCount + index) * 8UL);
+            if (!TryReadUInt32(ctx, entryAddress, out encodedRegisters[(int)index]) ||
+                !TryReadUInt32(ctx, entryAddress + sizeof(uint), out values[(int)index]))
+            {
+                return false;
+            }
+        }
+
+        Span<uint> resolvedRegisters = stackalloc uint[(int)registerCount];
+        if (!TryResolveVirtualContextRegisterGroup(
+                encodedRegisters,
+                values,
+                resolvedRegisters))
+        {
+            return true;
+        }
+
+        for (uint index = 0; index < registerCount; index++)
+        {
+            var entryAddress = registersAddress + ((currentCount + index) * 8UL);
+            if (!TryWriteUInt32(ctx, entryAddress, resolvedRegisters[(int)index]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryMaterializeBlendTargetMaskPair(
+        CpuContext ctx,
+        ulong registersAddress,
+        uint currentCount)
+    {
+        if (currentCount == 0)
+        {
+            return true;
+        }
+
+        var currentAddress = registersAddress + (currentCount * 8UL);
+        var previousAddress = currentAddress - 8;
+        if (!TryReadUInt32(ctx, previousAddress, out var previousEncoded) ||
+            !TryReadUInt32(ctx, previousAddress + sizeof(uint), out var blendControl) ||
+            !TryReadUInt32(ctx, currentAddress, out var currentEncoded) ||
+            !TryReadUInt32(ctx, currentAddress + sizeof(uint), out var targetMask))
+        {
+            return false;
+        }
+
+        if (!IsVirtualContextRegister(previousEncoded) ||
+            !IsVirtualContextRegister(currentEncoded) ||
+            !IsBlendTargetMaskPair(blendControl, targetMask))
+        {
+            return true;
+        }
+
+        return TryWriteUInt32(ctx, previousAddress, CbBlend0Control) &&
+               TryWriteUInt32(ctx, currentAddress, CbTargetMask);
+    }
+
+    internal static bool TryResolveVirtualContextRegisterGroup(
+        ReadOnlySpan<uint> encodedRegisters,
+        ReadOnlySpan<uint> values,
+        Span<uint> resolvedRegisters)
+    {
+        if (encodedRegisters.Length != values.Length ||
+            resolvedRegisters.Length < encodedRegisters.Length ||
+            !AreAllVirtualContextRegisters(encodedRegisters))
+        {
+            return false;
+        }
+
+        if (encodedRegisters.Length == 19)
+        {
+            for (var index = 0; index < encodedRegisters.Length; index++)
+            {
+                resolvedRegisters[index] = SpiPsInputCntl0 + (uint)index;
+            }
+
+            return true;
+        }
+
+        if (encodedRegisters.Length != 16 ||
+            !AreAllRegistersEqual(encodedRegisters))
+        {
+            return false;
+        }
+
+        var virtualOffset = encodedRegisters[0] - VirtualContextRegisterBase;
+        var isColorTarget =
+            virtualOffset != 0 ||
+            (values[15] & 0x0000C000u) == 0x0000C000u;
+        if (isColorTarget)
+        {
+            if (virtualOffset % CbColorRegisterStride != 0)
+            {
+                return false;
+            }
+
+            var slot = virtualOffset / CbColorRegisterStride;
+            if (slot >= ColorTargetCount)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < ColorTargetRegisterLayout.Length; index++)
+            {
+                resolvedRegisters[index] = ColorTargetRegisterLayout[index] +
+                    (index < 10 ? virtualOffset : slot);
+            }
+
+            return true;
+        }
+
+        DepthTargetRegisterLayout.CopyTo(resolvedRegisters);
+        return true;
+    }
+
+    internal static bool IsBlendTargetMaskPair(uint blendControl, uint targetMask)
+    {
+        // CB_TARGET_MASK has one four-bit write mask per render target. The
+        // observed AGC state builders append it immediately after
+        // CB_BLEND0_CONTROL. Reject values outside that packed mask shape so
+        // unrelated singleton groups are left unresolved.
+        _ = blendControl;
+        return targetMask == 0x0000000Fu;
+    }
+
+    private static bool IsVirtualContextRegister(uint encodedRegister) =>
+        (encodedRegister & 0xF0000000u) == VirtualContextRegisterBase;
+
+    private static bool AreAllVirtualContextRegisters(ReadOnlySpan<uint> encodedRegisters)
+    {
+        foreach (var encodedRegister in encodedRegisters)
+        {
+            if (!IsVirtualContextRegister(encodedRegister))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool AreAllRegistersEqual(ReadOnlySpan<uint> encodedRegisters)
+    {
+        for (var index = 1; index < encodedRegisters.Length; index++)
+        {
+            if (encodedRegisters[index] != encodedRegisters[0])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static int DcbSetRegistersIndirect(CpuContext ctx, uint packetRegister, string registerSpace)
@@ -13986,8 +14238,8 @@ public static partial class AgcExports
         var tracePackets = string.Equals(
             Environment.GetEnvironmentVariable("SHARPEMU_LOG_AGC"), "1", StringComparison.Ordinal);
 
-        // Multi-DCB submission is Minecraft's normal graphics path. The
-        // presenter needs the live guest-memory view to publish writable
+        // The presenter needs the live guest-memory view for every submission
+        // path so it can publish writable
         // storage-buffer results (for example generated vertex/index data)
         // after a release/acquire synchronization point, just like the
         // single-DCB and ACB entry points do.

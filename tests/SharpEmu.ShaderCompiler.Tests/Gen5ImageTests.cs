@@ -44,16 +44,20 @@ public sealed class Gen5ImageTests
             expectedCoordinateComponents);
     }
 
-    [Fact]
-    public void ImageSampleDim3DUsesThreeComponentSampleCoordinates()
+    [Theory]
+    [InlineData(2u, SpirvImageDim.Dim3D)]
+    [InlineData(3u, SpirvImageDim.Cube)]
+    public void ImageSampleVolumeAndCubeUseThreeComponentSampleCoordinates(
+        uint dimension,
+        SpirvImageDim expectedImageDimension)
     {
         var instructions = ReadSpirvInstructions(
-            CompileImageOperation("ImageSampleLz", dimension: 2));
+            CompileImageOperation("ImageSampleLz", dimension));
         var imageType = Assert.Single(
             instructions,
             item => item.Opcode == SpirvOp.TypeImage);
 
-        Assert.Equal((uint)SpirvImageDim.Dim3D, imageType.Operands[2]);
+        Assert.Equal((uint)expectedImageDimension, imageType.Operands[2]);
         Assert.Equal(1u, imageType.Operands[6]);
         AssertCoordinateVectorWidth(
             instructions,
@@ -64,7 +68,7 @@ public sealed class Gen5ImageTests
 
     private static byte[] CompileImageOperation(string opcode, uint dimension)
     {
-        var addressRegisters = dimension == 2
+        var addressRegisters = dimension is 2 or 3
             ? new uint[] { 0, 1, 2 }
             : [0, 1];
         var control = new Gen5ImageControl(
@@ -103,7 +107,12 @@ public sealed class Gen5ImageTests
         var scalarRegisters = new uint[256];
         var descriptor = new uint[8];
         descriptor[1] = 71u << 20; // FORMAT_16_16_16_16_FLOAT
-        descriptor[3] = (dimension == 2 ? 10u : 9u) << 28;
+        descriptor[3] = (dimension switch
+        {
+            2 => 10u,
+            3 => 11u,
+            _ => 9u,
+        }) << 28;
         var evaluation = new Gen5ShaderEvaluation(
             scalarRegisters,
             scalarRegisters,

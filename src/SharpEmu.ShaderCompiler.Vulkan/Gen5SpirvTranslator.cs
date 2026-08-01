@@ -1015,9 +1015,12 @@ public static partial class Gen5SpirvTranslator
                         SpirvCapability.StorageImageExtendedFormats);
                 }
 
-                var dimension = binding.Control.Dimension == 2
-                    ? SpirvImageDim.Dim3D
-                    : SpirvImageDim.Dim2D;
+                var dimension = binding.Control.Dimension switch
+                {
+                    2 => SpirvImageDim.Dim3D,
+                    3 => SpirvImageDim.Cube,
+                    _ => SpirvImageDim.Dim2D,
+                };
                 var isArrayed = dimension != SpirvImageDim.Dim3D &&
                     !isStorage &&
                     Gen5ShaderTranslator.IsArrayedImageBinding(binding);
@@ -3915,7 +3918,9 @@ public static partial class Gen5SpirvTranslator
 
         private static uint ImageSpatialComponentCount(
             SpirvImageResource resource) =>
-            resource.Dimension == SpirvImageDim.Dim3D ? 3u : 2u;
+            resource.Dimension is SpirvImageDim.Dim3D or SpirvImageDim.Cube
+                ? 3u
+                : 2u;
 
         private static uint ImageCoordinateComponentCount(
             SpirvImageResource resource) =>

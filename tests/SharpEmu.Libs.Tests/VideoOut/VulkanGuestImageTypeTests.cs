@@ -46,4 +46,27 @@ public sealed class VulkanGuestImageTypeTests
                 VulkanVideoPresenter.Gen5TextureType2D,
                 7));
     }
+
+    [Fact]
+    public void CubeDescriptorsUseTwoDimensionalImagesAndCubeViews()
+    {
+        Assert.Equal(
+            ImageType.Type2D,
+            VulkanVideoPresenter.GetGuestTextureImageType(
+                VulkanVideoPresenter.Gen5TextureTypeCube));
+        Assert.Equal(
+            ImageViewType.TypeCube,
+            VulkanVideoPresenter.GetGuestTextureViewType(
+                VulkanVideoPresenter.Gen5TextureTypeCube));
+        Assert.Equal(
+            ImageViewType.TypeCubeArray,
+            VulkanVideoPresenter.GetGuestTextureViewType(
+                VulkanVideoPresenter.Gen5TextureTypeCube,
+                arrayedView: true));
+        Assert.Equal(
+            1u,
+            VulkanVideoPresenter.GetGuestTextureDepth(
+                VulkanVideoPresenter.Gen5TextureTypeCube,
+                6));
+    }
 }

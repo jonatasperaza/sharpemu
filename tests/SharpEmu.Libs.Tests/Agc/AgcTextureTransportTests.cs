@@ -60,6 +60,22 @@ public sealed class AgcTextureTransportTests
             AgcExports.GetTextureByteCount(10, 8, 6, depth: 0));
     }
 
+    [Theory]
+    [InlineData(9u, 6u, 1u)]
+    [InlineData(10u, 6u, 1u)]
+    [InlineData(11u, 6u, 6u)]
+    [InlineData(12u, 4u, 4u)]
+    [InlineData(13u, 8u, 8u)]
+    public void GetTextureArrayLayers_UsesLastSliceForLayeredDescriptors(
+        uint type,
+        uint descriptorDepth,
+        uint expectedLayers)
+    {
+        Assert.Equal(
+            expectedLayers,
+            AgcExports.GetTextureArrayLayers(type, descriptorDepth));
+    }
+
     [Fact]
     public void GuestDrawTexture_CarriesRawTypeAndNormalizedDepth()
     {
@@ -88,6 +104,19 @@ public sealed class AgcTextureTransportTests
 
         Assert.NotEqual(twoDimensional, threeDimensional);
         Assert.NotEqual(threeDimensional, deeperThreeDimensional);
+    }
+
+    [Fact]
+    public void TextureContentIdentity_DistinguishesArrayViewBaseLayer()
+    {
+        var firstCube = CreateIdentity(type: 11, depth: 1) with
+        {
+            ArrayLayers = 12,
+            BaseArrayLayer = 0,
+        };
+        var secondCube = firstCube with { BaseArrayLayer = 6 };
+
+        Assert.NotEqual(firstCube, secondCube);
     }
 
     private static TextureContentIdentity CreateIdentity(uint type, uint depth) =>

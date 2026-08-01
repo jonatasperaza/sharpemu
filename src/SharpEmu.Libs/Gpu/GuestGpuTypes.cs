@@ -36,6 +36,7 @@ internal sealed record GuestDrawTexture(
     long WriteGeneration = -1,
     bool ArrayedView = false,
     uint ArrayLayers = 1,
+    uint BaseArrayLayer = 0,
     uint Type = 9,
     uint Depth = 1,
     // GPU-detile opt-in (SHARPEMU_GPU_DETILE): when Detile is non-null the AGC
@@ -67,6 +68,7 @@ internal readonly record struct TextureContentIdentity(
     GuestSampler Sampler,
     bool Arrayed = false,
     uint ArrayLayers = 1,
+    uint BaseArrayLayer = 0,
     uint Type = 9,
     uint Depth = 1);
 
