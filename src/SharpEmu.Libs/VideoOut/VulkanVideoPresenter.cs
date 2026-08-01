@@ -679,10 +679,19 @@ internal static unsafe class VulkanVideoPresenter
 
     private static bool ShouldTraceGuestImageSubmissionsForDiagnostics()
     {
-        return string.Equals(
-            Environment.GetEnvironmentVariable("SHARPEMU_TRACE_GUEST_IMAGES"),
-            "1",
-            StringComparison.Ordinal);
+        var mode =
+            Environment.GetEnvironmentVariable(
+                "SHARPEMU_TRACE_GUEST_IMAGES");
+    
+        return
+            string.Equals(
+                mode,
+                "1",
+                StringComparison.Ordinal) ||
+            string.Equals(
+                mode,
+                "submit",
+                StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool ShouldSamplePresentedGuestImageForDiagnostics(long frame)
@@ -2654,13 +2663,28 @@ internal static unsafe class VulkanVideoPresenter
 
     private static long GetGuestWorkDependencyLocked(object work)
     {
+        var required = 0L;
+    
+        // An ordered flip may be submitted through a different logical guest
+        // queue from the graphics work that produced the display buffer.
+        // Do not allow the priority-sync scheduler to capture the image until
+        // the last writer that was already queued for this address has completed.
+        if (work is VulkanOrderedGuestFlip flip &&
+            flip.Address != 0 &&
+            _guestImageWorkSequences.TryGetValue(
+                flip.Address,
+                out var imageWorkSequence))
+        {
+            required = imageWorkSequence;
+        }
+    
         IReadOnlyList<GuestDrawTexture> textures = work switch
         {
             VulkanOffscreenGuestDraw draw => draw.Draw.Textures,
             VulkanComputeGuestDispatch compute => compute.Textures,
             _ => Array.Empty<GuestDrawTexture>(),
         };
-        var required = 0L;
+    
         foreach (var texture in textures)
         {
             if (!texture.IsStorage ||
@@ -2669,16 +2693,24 @@ internal static unsafe class VulkanVideoPresenter
             {
                 continue;
             }
-
-            var format = GetGuestTextureFormat(texture.Format, texture.NumberType);
+    
+            var format =
+                GetGuestTextureFormat(
+                    texture.Format,
+                    texture.NumberType);
+    
             if (_pendingGuestImageUploads.TryGetValue(
                     (texture.Address, format),
                     out var pendingUpload))
             {
-                required = Math.Max(required, pendingUpload.OwnerSequence);
+                required =
+                    Math.Max(
+                        required,
+                        pendingUpload.OwnerSequence);
+                    
             }
         }
-
+    
         return required;
     }
 
@@ -3192,6 +3224,15 @@ internal static unsafe class VulkanVideoPresenter
         // queue signal in submission order, so "timeline <= completed" means
         // the GPU is done with everything submitted up to that point; this
         // lets evicted resources be destroyed without a queue drain.
+        // 
+        private const ulong MinecraftDisplayBuffer0 = 0x00000000001E0000UL;
+        private const ulong MinecraftDisplayBuffer1 = 0x0000000000A50000UL;
+        
+        private static bool IsMinecraftDisplayBuffer(ulong address) =>
+            address == MinecraftDisplayBuffer0 ||
+            address == MinecraftDisplayBuffer1;
+
+            
         private ulong _submitTimeline;
         private ulong _completedTimeline;
         private readonly Queue<(TextureResource Texture, ulong RetireTimeline)>
@@ -5695,6 +5736,17 @@ internal static unsafe class VulkanVideoPresenter
         private void ExecuteOrderedGuestFlip(VulkanOrderedGuestFlip work)
         {
             FlushBatchedGuestCommands();
+            if (IsMinecraftDisplayBuffer(work.Address))
+            {
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_buffer_flip " +
+                    $"version={work.Version} " +
+                    $"addr=0x{work.Address:X16} " +
+                    $"handle={work.VideoOutHandle} " +
+                    $"index={work.DisplayBufferIndex} " +
+                    $"size={work.Width}x{work.Height} " +
+                    $"pitch={work.PitchInPixel}");
+            }
             
             _guestImages.TryGetValue(work.Address, out var source);
             if (_deviceLost ||
@@ -5830,6 +5882,7 @@ internal static unsafe class VulkanVideoPresenter
                 submitted = true;
                 
                 snapshot.Initialized = true;
+                
                 _guestImageVersions.Add(work.Version, snapshot);
                 _capturedGuestFlipVersions.Add(work.Version);
                 var flipTraceIndex =
@@ -5928,7 +5981,6 @@ internal static unsafe class VulkanVideoPresenter
         
         private int _flipCaptureSuccessTraceCount;
         private int _presentResolveTraceCount;
-        private int _flipSnapshotReadbackTraceCount;
 
         private GuestImageResource CreateGuestFlipSnapshot(
             GuestImageResource source,
@@ -11471,6 +11523,26 @@ internal static unsafe class VulkanVideoPresenter
 
         private void ExecuteComputeDispatch(VulkanComputeGuestDispatch work)
         {
+            foreach (var texture in work.Textures)
+            {
+                if (!texture.IsStorage ||
+                    !IsMinecraftDisplayBuffer(texture.Address))
+                {
+                    continue;
+                }
+            
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_buffer_write " +
+                    $"operation=compute-storage " +
+                    $"addr=0x{texture.Address:X16} " +
+                    $"shader=0x{work.ShaderAddress:X16} " +
+                    $"groups={work.GroupCountX}x" +
+                    $"{work.GroupCountY}x{work.GroupCountZ} " +
+                    $"base={work.BaseGroupX}x" +
+                    $"{work.BaseGroupY}x{work.BaseGroupZ} " +
+                    $"format={texture.Format}/{texture.NumberType} " +
+                    $"size={texture.Width}x{texture.Height}");
+            }
             var perfStart = Stopwatch.GetTimestamp();
             Interlocked.Increment(ref _perfDrawCount);
             PerfOverlay.RecordDraw();
@@ -12360,6 +12432,24 @@ internal static unsafe class VulkanVideoPresenter
                 return;
             }
 
+            foreach (var target in work.Targets)
+            {
+                if (!IsMinecraftDisplayBuffer(target.Address))
+                {
+                    continue;
+                }
+            
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_buffer_write " +
+                    $"operation=draw " +
+                    $"addr=0x{target.Address:X16} " +
+                    $"shader=0x{work.ShaderAddress:X16} " +
+                    $"mrt={work.Targets.Count} " +
+                    $"vertices={work.Draw.VertexCount} " +
+                    $"primitive={work.Draw.PrimitiveType} " +
+                    $"publish={(work.PublishTarget ? 1 : 0)}");
+            }
+
             var perfStart = System.Diagnostics.Stopwatch.GetTimestamp();
             Interlocked.Increment(ref _perfDrawCount);
             PerfOverlay.RecordDraw();
@@ -13004,6 +13094,22 @@ internal static unsafe class VulkanVideoPresenter
             {
                 return;
             }
+            foreach (var target in work.Targets)
+            {
+                if (!IsMinecraftDisplayBuffer(target.Address))
+                {
+                    continue;
+                }
+            
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_buffer_write " +
+                    $"operation=clear " +
+                    $"addr=0x{target.Address:X16} " +
+                    $"shader=0x{work.ShaderAddress:X16} " +
+                    $"mrt={work.Targets.Count} " +
+                    $"rgba=({work.Red:R},{work.Green:R}," +
+                    $"{work.Blue:R},{work.Alpha:R})");
+            }
 
             Interlocked.Increment(ref _perfDrawCount);
             PerfOverlay.RecordDraw();
@@ -13127,6 +13233,21 @@ internal static unsafe class VulkanVideoPresenter
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void ExecuteGuestImageWrite(VulkanGuestImageWrite work)
         {
+            if (IsMinecraftDisplayBuffer(work.Address))
+            {
+                var operation =
+                    work.Pixels is null
+                        ? "fill"
+                        : "upload";
+            
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_buffer_write " +
+                    $"operation={operation} " +
+                    $"addr=0x{work.Address:X16} " +
+                    $"bytes={work.Pixels?.Length ?? 0} " +
+                    $"fill=0x{work.FillValue:X8} " +
+                    $"row_offset={work.RowOffset}");
+            }
             if (_deviceLost || !_guestImages.TryGetValue(work.Address, out var target))
             {
                 return;
@@ -15213,29 +15334,6 @@ internal static unsafe class VulkanVideoPresenter
                 }
 
                 return;
-            }
-            if (ownsPresentedGuestImageVersion &&
-                presentedGuestImage is not null &&
-                presentedGuestImage.Initialized)
-            {
-                var readbackIndex =
-                    Interlocked.Increment(ref _flipSnapshotReadbackTraceCount);
-            
-                // Primeiros frames: captura todos para detectar imagem/preto.
-                // Depois: captura periodicamente até a tela de menu.
-                var shouldReadback =
-                    readbackIndex <= 20 ||
-                    readbackIndex <= 300 && readbackIndex % 10 == 0;
-            
-                if (shouldReadback)
-                {
-                    Console.Error.WriteLine(
-                        $"[LOADER][TRACE] vk.flip_snapshot_readback#{readbackIndex} " +
-                        $"version={presentation.GuestImageVersion} " +
-                        $"addr=0x{presentedGuestImage.Address:X16}");
-            
-                    TraceGuestImageContents(presentedGuestImage);
-                }
             }
             if (ownsPresentedGuestImageVersion)
             {   
