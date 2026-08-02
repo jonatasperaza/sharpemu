@@ -520,6 +520,9 @@ internal static unsafe class VulkanVideoPresenter
     // presentation indefinitely.
     private static readonly Queue<Presentation> _pendingGuestImagePresentations = new();
     private static readonly Dictionary<ulong, long> _guestImageWorkSequences = new();
+        
+
+    
     private static readonly Dictionary<ulong, uint> _availableGuestImages = new();
     // Write-tracker generation last uploaded for a CPU-backed guest image.
     // A newer generation in the tracker means the guest CPU rewrote the
@@ -798,6 +801,7 @@ internal static unsafe class VulkanVideoPresenter
         _pendingGuestWorkBytes = 0;
         _pendingGuestImagePresentations.Clear();
         _guestImageWorkSequences.Clear();
+
         _availableGuestImages.Clear();
         _cpuBackedUploadGenerations.Clear();
         _untrackedGuestImageContentProbes.Clear();
@@ -2601,10 +2605,8 @@ internal static unsafe class VulkanVideoPresenter
         VulkanGuestImageWrite or
         VulkanOffscreenColorClear;
 
-    private static bool IsPrioritySyncGuestWork(object work) => work is
-        VulkanOrderedGuestAction or
-        VulkanOrderedGuestFlip or
-        VulkanOrderedGuestFlipWait;
+        private static bool IsPrioritySyncGuestWork(object work) =>
+            work is VulkanOrderedGuestAction;
 
     private static string FormatGuestQueueBacklogLocked()
     {
