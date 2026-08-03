@@ -1,0 +1,1525 @@
+===== PROCESS =====
+Microsoft.PowerShell.Commands.Internal.Format.FormatStartData
+Microsoft.PowerShell.Commands.Internal.Format.GroupStartData
+Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData
+Microsoft.PowerShell.Commands.Internal.Format.GroupEndData
+Microsoft.PowerShell.Commands.Internal.Format.FormatEndData
+
+===== STACK 1 =====
+Thread (0x5A6C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.WaitForHostMutexLock(class PthreadMutexState,class PthreadMutexWaiter)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteEntry(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryExecute(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntryCore(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class EntryFrameKind)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntry(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions)
+  SharpEmu.Core!SharpEmu.Core.Runtime.SharpEmuRuntime.Run(class System.String)
+  SharpEmu!SharpEmu.CLI.Program.RunEmulator(class System.String[],bool)
+  SharpEmu!SharpEmu.CLI.Program.Run(class System.String[])
+  SharpEmu!SharpEmu.CLI.Program.Main(class System.String[])
+
+Thread (0x4A04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x22C0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5824):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BE8):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x34B8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__1()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x884):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass381_0.<StartReadyThreadDispatcher>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x9A0):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1E28):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1250):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xBA4):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4C50):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x560C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2C14):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4A3C):
+  CPU_TIME
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3A1C):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryCopy(unsigned int64,unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryDispatchHotMemoryLeaf(class SharpEmu.HLE.CpuContext,value class ImportStubEntry,int,unsigned int64&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x432C):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryCopy(unsigned int64,unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryDispatchHotMemoryLeaf(class SharpEmu.HLE.CpuContext,value class ImportStubEntry,int,unsigned int64&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x499C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4EC0):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryRead(unsigned int64,value class System.Span`1<unsigned int8>)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.TryReadUInt64Compat(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2CE0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1AE0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E24):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x12B4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5438):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xCF4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3278):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3C70):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5250):
+  CPU_TIME
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.WaitForRenderWork()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.SdlHostWindow.Run(class System.Action,class System.Action`1<float64>,class System.Action,class System.Action)
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.Run()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter.Run()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3670):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x52AC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4CA0):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.TryWriteUInt32(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.KernelWaitEqueue(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteBlockedGuestThreadContinuation(class SharpEmu.HLE.CpuContext,value class SharpEmu.HLE.GuestCpuContinuation,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2AC4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3CC0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x574C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1518):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4FE4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryRead(unsigned int64,value class System.Span`1<unsigned int8>)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.TryReadUInt64Compat(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3484):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2A00):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Cpu.TrackedCpuMemory.TryRead(unsigned int64,value class System.Span`1<unsigned int8>)
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports.AudioOut2PortSetAttributes(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E3C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4908):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.ShaderCompiler!SharpEmu.ShaderCompiler.Gen5ShaderScalarEvaluator.TryReadUInt32(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int32&)
+  SharpEmu.ShaderCompiler!SharpEmu.ShaderCompiler.Gen5ShaderScalarEvaluator.TryExecuteScalarLoad(class SharpEmu.HLE.CpuContext,class SharpEmu.ShaderCompiler.Gen5ShaderState,class SharpEmu.ShaderCompiler.Gen5ShaderInstruction,class SharpEmu.ShaderCompiler.Gen5ScalarMemoryControl,unsigned int32[],class System.Collections.Generic.List`1<class SharpEmu.ShaderCompiler.Gen5GlobalMemoryBinding>,class System.Collections.Generic.Dictionary`2<value class System.ValueTuple`2<unsigned int32,unsigned int64>,class SharpEmu.ShaderCompiler.Gen5GlobalMemoryBinding>,class System.Collections.Generic.IReadOnlySet`1<unsigned int32>,bool,class System.String&)
+  SharpEmu.ShaderCompiler!SharpEmu.ShaderCompiler.Gen5ShaderScalarEvaluator.TryEvaluate(class SharpEmu.HLE.CpuContext,class SharpEmu.ShaderCompiler.Gen5ShaderState,class SharpEmu.ShaderCompiler.Gen5ShaderEvaluation&,class System.String&,bool,value class System.Nullable`1<unsigned int32>)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.TryCreateTranslatedGuestDraw(class SharpEmu.HLE.CpuContext,class SubmittedDcbState,unsigned int64,unsigned int64,unsigned int32,unsigned int32,unsigned int32,bool,class TranslatedGuestDraw&,class System.String&)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.TryTranslateGuestDraw(class SharpEmu.HLE.CpuContext,class SubmittedGpuState,class SubmittedDcbState,unsigned int32,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.ParseSubmittedDcbCore(class SharpEmu.HLE.CpuContext,class SubmittedGpuState,class SubmittedDcbState,unsigned int64,unsigned int32,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.ParseSubmittedDcb(class SharpEmu.HLE.CpuContext,class SubmittedGpuState,class SubmittedDcbState,unsigned int64,unsigned int32,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.ResumeSuspendedDcb(class SharpEmu.HLE.CpuContext,class SubmittedGpuState,value class WaitingDcb&,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.DrainResumableDcbs(class SharpEmu.HLE.CpuContext,class SubmittedGpuState,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports.MonitorGpuWaits(class SharpEmu.HLE.CpuContext,class SubmittedGpuState)
+  SharpEmu.Libs!SharpEmu.Libs.Agc.AgcExports+<>c.<EnsureGpuWaitMonitor>b__421_0(value class System.ValueTuple`2<class SharpEmu.HLE.CpuContext,class SubmittedGpuState>)
+  System.Private.CoreLib.il!System.Threading.QueueUserWorkItemCallbackDefaultContext`1[System.ValueTuple`2[System.__Canon,System.__Canon]].Execute()
+  System.Private.CoreLib.il!System.Threading.ThreadPoolWorkQueue.Dispatch()
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x668):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x14B0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1C8C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BC4):
+  [Native Frames]
+  System.Net.Sockets.il!Interop+Winsock.recvfrom(class System.Net.Sockets.SafeSocketHandle,value class System.Span`1<unsigned int8>,int32,value class System.Net.Sockets.SocketFlags,value class System.Span`1<unsigned int8>,int32&)
+  System.Net.Sockets.il!System.Net.Sockets.Socket.ReceiveFrom(unsigned int8[],int32,int32,value class System.Net.Sockets.SocketFlags,class System.Net.EndPoint&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelSocketCompatExports.Recvfrom(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5ADC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5A7C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x350):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x453C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+
+===== STACK 2 =====
+Thread (0x5A6C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.WaitForHostMutexLock(class PthreadMutexState,class PthreadMutexWaiter)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteEntry(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryExecute(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntryCore(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class EntryFrameKind)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntry(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions)
+  SharpEmu.Core!SharpEmu.Core.Runtime.SharpEmuRuntime.Run(class System.String)
+  SharpEmu!SharpEmu.CLI.Program.RunEmulator(class System.String[],bool)
+  SharpEmu!SharpEmu.CLI.Program.Run(class System.String[])
+  SharpEmu!SharpEmu.CLI.Program.Main(class System.String[])
+
+Thread (0x4A04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x22C0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5824):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BE8):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x34B8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__1()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x884):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass381_0.<StartReadyThreadDispatcher>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x9A0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1E28):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1250):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xBA4):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4C50):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x560C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2C14):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4A3C):
+  CPU_TIME
+  System.Private.CoreLib.il!System.IO.File.Exists(class System.String)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.KernelStat(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3A1C):
+  CPU_TIME
+  System.Private.CoreLib.il!System.IO.FileSystemInfo.EnsureDataInitialized()
+  System.Private.CoreLib.il!System.IO.FileInfo.get_Length()
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.TryWriteHostPathStat(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,bool)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.TryWriteOpenDescriptorStat(class SharpEmu.HLE.CpuContext,int32,unsigned int64)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.KernelFstat(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x432C):
+  CPU_TIME
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryCopy(unsigned int64,unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryDispatchHotMemoryLeaf(class SharpEmu.HLE.CpuContext,value class ImportStubEntry,int,unsigned int64&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x499C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4EC0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2CE0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1AE0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E24):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x12B4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5438):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xCF4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3278):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3C70):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5250):
+  CPU_TIME
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.WaitForRenderWork()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.SdlHostWindow.Run(class System.Action,class System.Action`1<float64>,class System.Action,class System.Action)
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.Run()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter.Run()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3670):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x52AC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4CA0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.KernelWaitEqueue(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteBlockedGuestThreadContinuation(class SharpEmu.HLE.CpuContext,value class SharpEmu.HLE.GuestCpuContinuation,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2AC4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3CC0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x574C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1518):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4FE4):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3484):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim+SpinLock.EnterSpin(value class EnterSpinLockReason)
+  System.Private.CoreLib.il!System.Threading.ReaderWriterLockSlim.TryEnterReadLockCore(value class TimeoutTracker)
+  SharpEmu.Core!SharpEmu.Core.Memory.PhysicalVirtualMemory.TryWrite(unsigned int64,value class System.ReadOnlySpan`1<unsigned int8>)
+  SharpEmu.HLE!SharpEmu.HLE.CpuContext.TryWriteUInt64(unsigned int64,unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2A00):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports+ContextState.PaceAdvance()
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports.AudioOut2ContextPush(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E3C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4908):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x668):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x14B0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1C8C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BC4):
+  [Native Frames]
+  System.Net.Sockets.il!Interop+Winsock.recvfrom(class System.Net.Sockets.SafeSocketHandle,value class System.Span`1<unsigned int8>,int32,value class System.Net.Sockets.SocketFlags,value class System.Span`1<unsigned int8>,int32&)
+  System.Net.Sockets.il!System.Net.Sockets.Socket.ReceiveFrom(unsigned int8[],int32,int32,value class System.Net.Sockets.SocketFlags,class System.Net.EndPoint&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelSocketCompatExports.Recvfrom(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5ADC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5A7C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x350):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x453C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1F04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5974):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+
+===== STACK 3 =====
+Thread (0x5A6C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.WaitForHostMutexLock(class PthreadMutexState,class PthreadMutexWaiter)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteEntry(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryExecute(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntryCore(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class EntryFrameKind)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntry(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions)
+  SharpEmu.Core!SharpEmu.Core.Runtime.SharpEmuRuntime.Run(class System.String)
+  SharpEmu!SharpEmu.CLI.Program.RunEmulator(class System.String[],bool)
+  SharpEmu!SharpEmu.CLI.Program.Run(class System.String[])
+  SharpEmu!SharpEmu.CLI.Program.Main(class System.String[])
+
+Thread (0x4A04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x22C0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5824):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BE8):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x34B8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__1()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x884):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass381_0.<StartReadyThreadDispatcher>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x9A0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1E28):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1250):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xBA4):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4C50):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x560C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2C14):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4A3C):
+  CPU_TIME
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3A1C):
+  CPU_TIME
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.EscapesMountViaReparsePoint(class System.String,class System.String)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.CombineWithinMount(class System.String,class System.String)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.ResolveGuestPath(class System.String)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelMemoryCompatExports.KernelStat(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x432C):
+  CPU_TIME
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryReadHostQword(unsigned int64,unsigned int64&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ReadImportStackArgument(int,int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x499C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4EC0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2CE0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1AE0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E24):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x12B4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5438):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xCF4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3278):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3C70):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5250):
+  CPU_TIME
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.WaitForRenderWork()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.SdlHostWindow.Run(class System.Action,class System.Action`1<float64>,class System.Action,class System.Action)
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.Run()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter.Run()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3670):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x52AC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4CA0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.KernelWaitEqueue(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteBlockedGuestThreadContinuation(class SharpEmu.HLE.CpuContext,value class SharpEmu.HLE.GuestCpuContinuation,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2AC4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3CC0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x574C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1518):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4FE4):
+  CPU_TIME
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3484):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2A00):
+  CPU_TIME
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports+ContextState.PaceAdvance()
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports.AudioOut2ContextPush(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4E3C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4908):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x668):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x14B0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1C8C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5BC4):
+  [Native Frames]
+  System.Net.Sockets.il!Interop+Winsock.recvfrom(class System.Net.Sockets.SafeSocketHandle,value class System.Span`1<unsigned int8>,int32,value class System.Net.Sockets.SocketFlags,value class System.Span`1<unsigned int8>,int32&)
+  System.Net.Sockets.il!System.Net.Sockets.Socket.ReceiveFrom(unsigned int8[],int32,int32,value class System.Net.Sockets.SocketFlags,class System.Net.EndPoint&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelSocketCompatExports.Recvfrom(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5ADC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5A7C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x350):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x453C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1F04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5974):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+
+===== LOG FINAL =====
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=519 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=520 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=521 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458800 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=522 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=523 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=524 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=525 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][WARN] agc.rt_sampled#64000 addr=0x31210000 first=False gpu_resident=True fmt=12/4 known_targets=27
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=526 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458800 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=527 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=528 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=529 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=530 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=531 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=532 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=533 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001446B100 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001446B100 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=534 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=535 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=536 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=537 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=538 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=539 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=540 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][WARN] agc.rt_sampled#66000 addr=0x35010000 first=False gpu_resident=True fmt=6/7 known_targets=27
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=541 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001446B100 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=542 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=543 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=42 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014491B00 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EC00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F600 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=544 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=545 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=546 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after restored SDL window: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan pipeline cache saved: path=C:\Users\User\Documents\sharpemu\artifacts\bin\Release\net10.0\win-x64\user\pipeline_cache\PPSA17221\vulkan-pipeline-cache.bin bytes=7107840
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1080, format=B8G8R8A8Unorm
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after restored SDL window: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1080, format=B8G8R8A8Unorm
