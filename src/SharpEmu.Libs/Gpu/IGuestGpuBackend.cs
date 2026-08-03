@@ -127,7 +127,8 @@ internal interface IGuestGpuBackend
         GuestRenderState? renderState = null,
         GuestDepthTarget? depthTarget = null,
         ulong shaderAddress = 0,
-        int baseVertex = 0);
+        int baseVertex = 0,
+        ulong drawSequence = 0);
 
     void SubmitStorageTranslatedDraw(
         IGuestCompiledShader pixelShader,

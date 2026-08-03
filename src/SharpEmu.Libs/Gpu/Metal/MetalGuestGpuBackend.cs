@@ -286,7 +286,8 @@ internal sealed class MetalGuestGpuBackend : IGuestGpuBackend
         GuestRenderState? renderState = null,
         GuestDepthTarget? depthTarget = null,
         ulong shaderAddress = 0,
-        int baseVertex = 0) =>
+        int baseVertex = 0,
+        ulong drawSequence = 0) =>
         MetalVideoPresenter.SubmitOffscreenTranslatedDraw(
             Msl(pixelShader),
             textures,
@@ -302,7 +303,8 @@ internal sealed class MetalGuestGpuBackend : IGuestGpuBackend
             renderState,
             depthTarget,
             shaderAddress,
-            baseVertex);
+            baseVertex,
+            drawSequence);
 
     public void SubmitStorageTranslatedDraw(
         IGuestCompiledShader pixelShader,

@@ -319,6 +319,18 @@ public static partial class AgcExports
     private const ulong MinecraftClearTraceTargetA = 0x1E0000;
     private const ulong MinecraftClearTraceTargetB = 0xA50000;
     private static int _minecraftClearTraceCount;
+    // SHARPEMU_TRACE_MINECRAFT_DRAW_STATE=1: trace one draw-state line per draw
+    // for the Minecraft solid-frame pixel shaders under a shared 400-draw budget.
+    // The Vulkan presenter mirrors the same budget for vk.minecraft_draw_resources.
+    private static readonly bool _traceMinecraftDrawState = string.Equals(
+        Environment.GetEnvironmentVariable("SHARPEMU_TRACE_MINECRAFT_DRAW_STATE"),
+        "1",
+        StringComparison.Ordinal);
+    private const int MinecraftDrawStateTraceBudget = 400;
+    private const ulong MinecraftDrawStateShaderA = 0x14414D00;
+    private const ulong MinecraftDrawStateShaderB = 0x14481D00;
+    private const ulong MinecraftDrawStateShaderC = 0x14458400;
+    private static int _minecraftDrawStateTraceCount;
     private static readonly bool _compatibilitySubmitCompletionEvent = string.Equals(
         Environment.GetEnvironmentVariable("SHARPEMU_AGC_SUBMIT_COMPLETION_EVENT"),
         "1",
@@ -535,7 +547,8 @@ public static partial class AgcExports
         float ClearAlpha = 1f,
         IReadOnlyList<IGuestCompiledShader>? PerTargetPixelShaders = null,
         IReadOnlyList<GuestRenderState>? PerTargetRenderStates = null,
-        bool IsDccFastClear = false);
+        bool IsDccFastClear = false,
+        uint PixelColorExportMasks = 0);
 
     private sealed record TranslatedImageBinding(
         TextureDescriptor Descriptor,
@@ -6830,6 +6843,7 @@ public static partial class AgcExports
                 out translationError))
         {
             state.TranslatedDraw = translatedDraw;
+            TraceMinecraftDrawState(drawSequence, translatedDraw);
             TraceMinecraftClearCandidate(state, drawSequence, translatedDraw);
 
             if (TryGetHardwareColorResolveTargets(
@@ -6963,7 +6977,8 @@ public static partial class AgcExports
                                 translatedDraw.ClearGreen,
                                 translatedDraw.ClearBlue,
                                 translatedDraw.ClearAlpha,
-                                translatedDraw.PixelShaderAddress);
+                                translatedDraw.PixelShaderAddress,
+                                drawSequence);
                         }
                     }
                     else
@@ -6974,7 +6989,8 @@ public static partial class AgcExports
                             translatedDraw.ClearGreen,
                             translatedDraw.ClearBlue,
                             translatedDraw.ClearAlpha,
-                            translatedDraw.PixelShaderAddress);
+                            translatedDraw.PixelShaderAddress,
+                            drawSequence);
                     }
                 }
                 else if (translatedDraw.PerTargetPixelShaders is { } perTargetShaders &&
@@ -7029,7 +7045,8 @@ public static partial class AgcExports
                             passRenderState,
                             translatedDraw.DepthTarget,
                             translatedDraw.PixelShaderAddress,
-                            translatedDraw.BaseVertex);
+                            translatedDraw.BaseVertex,
+                            drawSequence);
                     }
                 }
                 else
@@ -7049,7 +7066,8 @@ public static partial class AgcExports
                         translatedDraw.RenderState,
                         translatedDraw.DepthTarget,
                         translatedDraw.PixelShaderAddress,
-                        translatedDraw.BaseVertex);
+                        translatedDraw.BaseVertex,
+                        drawSequence);
                 }
             }
             else
@@ -8026,7 +8044,8 @@ public static partial class AgcExports
             fullscreenClearColor.Alpha,
 
             perTargetPixelShaders,
-            perTargetRenderStates);
+            perTargetRenderStates,
+            PixelColorExportMasks: pixelColorExportMasks);
 
             IsDccFastClearDraw(
                 state.CxRegisters,
@@ -8482,6 +8501,76 @@ public static partial class AgcExports
             $"{draw.ClearBlue:0.###},{draw.ClearAlpha:0.###}) " +
             $"scalars={scalars.Count} " +
             $"s0={(scalars.Count > 0 ? $"0x{scalars[0]:X8}" : "absent")}");
+    }
+
+    private static bool IsMinecraftDrawStateShader(ulong shaderAddress) =>
+        shaderAddress == MinecraftDrawStateShaderA ||
+        shaderAddress == MinecraftDrawStateShaderB ||
+        shaderAddress == MinecraftDrawStateShaderC;
+
+    private static void TraceMinecraftDrawState(
+        ulong sequence,
+        TranslatedGuestDraw draw)
+    {
+        if (!_traceMinecraftDrawState ||
+            !IsMinecraftDrawStateShader(draw.PixelShaderAddress))
+        {
+            return;
+        }
+
+        var count = Interlocked.Increment(ref _minecraftDrawStateTraceCount);
+        if (count > MinecraftDrawStateTraceBudget)
+        {
+            Interlocked.Decrement(ref _minecraftDrawStateTraceCount);
+            return;
+        }
+
+        var blendText = draw.RenderState.Blends.Count == 0
+            ? "<none>"
+            : string.Join(
+                ';',
+                draw.RenderState.Blends.Select(static blend =>
+                    $"{(blend.Enable ? 1 : 0)}:" +
+                    $"{blend.ColorSrcFactor}/{blend.ColorDstFactor}/{blend.ColorFunc}:" +
+                    $"{blend.AlphaSrcFactor}/{blend.AlphaDstFactor}/{blend.AlphaFunc}:" +
+                    $"w{blend.WriteMask:X}"));
+        var writeMask = draw.RenderState.Blends.Count != 0
+            ? draw.RenderState.Blends[0].WriteMask
+            : 0u;
+        var viewportText = draw.RenderState.Viewport is { } viewport
+            ? $"({viewport.X:0.###},{viewport.Y:0.###},{viewport.Width:0.###}," +
+              $"{viewport.Height:0.###},{viewport.MinDepth:0.###},{viewport.MaxDepth:0.###})"
+            : "none";
+        var scissorText = draw.RenderState.Scissor is { } scissor
+            ? $"({scissor.X},{scissor.Y},{scissor.Width},{scissor.Height})"
+            : "none";
+        var scalars = draw.PixelInitialScalars;
+        var scalarText = scalars.Count == 0
+            ? "<none>"
+            : string.Join(
+                ',',
+                scalars.Take(16).Select(static value => $"0x{value:X8}"));
+
+        Console.Error.WriteLine(
+            "[LOADER][TRACE] " +
+            $"agc.minecraft_draw_state seq={sequence} " +
+            $"ps=0x{draw.PixelShaderAddress:X16} " +
+            $"es=0x{draw.ExportShaderAddress:X16} " +
+            $"prim=0x{draw.PrimitiveType:X} " +
+            $"vertices={draw.VertexCount} instances={draw.InstanceCount} " +
+            $"export_masks=0x{draw.PixelColorExportMasks:X8} " +
+            $"color_info=0x{draw.RawColorInfo:X8} " +
+            $"blend_control=0x{draw.RawBlendControl:X8} " +
+            $"targets=[{string.Join(',', draw.RenderTargets.Select(static target =>
+                $"s{target.Slot}:0x{target.Address:X}:{target.Width}x{target.Height}:" +
+                $"f{target.Format}/n{target.NumberType}"))}] " +
+            $"blend_decoded=[{blendText}] write_mask=0x{writeMask:X} " +
+            $"viewport={viewportText} scissor={scissorText} " +
+            $"textures=[{string.Join(',', draw.Textures.Select(static binding =>
+                $"0x{binding.Descriptor.Address:X}:f{binding.Descriptor.Format}/" +
+                $"n{binding.Descriptor.NumberType}:{binding.Descriptor.Width}x{binding.Descriptor.Height}:" +
+                $"st{(binding.IsStorage ? 1 : 0)}"))}] " +
+            $"scalars=[{scalarText}]");
     }
 
     private static bool IsDccFastClearDraw(

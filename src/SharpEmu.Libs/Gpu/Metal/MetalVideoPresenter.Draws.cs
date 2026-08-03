@@ -248,7 +248,8 @@ internal static partial class MetalVideoPresenter
         GuestRenderState? renderState,
         GuestDepthTarget? depthTarget,
         ulong shaderAddress,
-        int baseVertex = 0)
+        int baseVertex = 0,
+        ulong drawSequence = 0)
     {
         if (targets.Count == 0)
         {

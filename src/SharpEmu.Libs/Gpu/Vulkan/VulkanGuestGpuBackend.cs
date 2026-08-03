@@ -214,7 +214,8 @@ internal sealed class VulkanGuestGpuBackend : IGuestGpuBackend
         GuestRenderState? renderState = null,
         GuestDepthTarget? depthTarget = null,
         ulong shaderAddress = 0,
-        int baseVertex = 0) =>
+        int baseVertex = 0,
+        ulong drawSequence = 0) =>
         VulkanVideoPresenter.SubmitOffscreenTranslatedDraw(
             Spirv(pixelShader),
             textures,
@@ -230,7 +231,8 @@ internal sealed class VulkanGuestGpuBackend : IGuestGpuBackend
             renderState,
             depthTarget,
             shaderAddress,
-            baseVertex);
+            baseVertex,
+            drawSequence);
 
     public void SubmitStorageTranslatedDraw(
         IGuestCompiledShader pixelShader,

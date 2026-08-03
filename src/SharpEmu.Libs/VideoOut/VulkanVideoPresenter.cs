@@ -51,7 +51,8 @@ internal sealed record VulkanOffscreenGuestDraw(
     IReadOnlyList<GuestRenderTarget> Targets,
     GuestDepthTarget? DepthTarget,
     bool PublishTarget,
-    ulong ShaderAddress);
+    ulong ShaderAddress,
+    ulong DrawSequence = 0);
 
 internal sealed record VulkanOffscreenColorClear(
     IReadOnlyList<GuestRenderTarget> Targets,
@@ -59,7 +60,8 @@ internal sealed record VulkanOffscreenColorClear(
     float Green,
     float Blue,
     float Alpha,
-    ulong ShaderAddress);
+    ulong ShaderAddress,
+    ulong DrawSequence = 0);
 
 internal sealed record VulkanComputeGuestDispatch(
     ulong ShaderAddress,
@@ -1051,6 +1053,18 @@ internal static unsafe class VulkanVideoPresenter
             Environment.GetEnvironmentVariable("SHARPEMU_TRACE_GUEST_WORK_COMPLETION"),
             "1",
             StringComparison.Ordinal);
+    // SHARPEMU_TRACE_MINECRAFT_DRAW_STATE=1: mirror the AGC draw-state trace
+    // with a per-draw resource-resolution line for the Minecraft solid-frame
+    // pixel shaders, under the same shared 400-draw budget.
+    private static readonly bool _traceMinecraftDrawState = string.Equals(
+        Environment.GetEnvironmentVariable("SHARPEMU_TRACE_MINECRAFT_DRAW_STATE"),
+        "1",
+        StringComparison.Ordinal);
+    private const int MinecraftDrawStateTraceBudget = 400;
+    private const ulong MinecraftDrawStateShaderA = 0x14414D00;
+    private const ulong MinecraftDrawStateShaderB = 0x14481D00;
+    private const ulong MinecraftDrawStateShaderC = 0x14458400;
+    private static int _minecraftDrawStateTraceCount;
     private static readonly bool _traceFlipOrder =
         string.Equals(
             Environment.GetEnvironmentVariable("SHARPEMU_TRACE_FLIP_ORDER"),
@@ -1496,7 +1510,8 @@ internal static unsafe class VulkanVideoPresenter
         GuestRenderState? renderState = null,
         GuestDepthTarget? depthTarget = null,
         ulong shaderAddress = 0,
-        int baseVertex = 0)
+        int baseVertex = 0,
+        ulong drawSequence = 0)
     {
         SubmitOffscreenTranslatedDraw(
             pixelSpirv,
@@ -1513,7 +1528,8 @@ internal static unsafe class VulkanVideoPresenter
             renderState,
             depthTarget,
             shaderAddress,
-            baseVertex);
+            baseVertex,
+            drawSequence);
     }
 
     // Manual scans (targets are <= 8) so the per-draw validation does not
@@ -1567,7 +1583,8 @@ internal static unsafe class VulkanVideoPresenter
         GuestRenderState? renderState = null,
         GuestDepthTarget? depthTarget = null,
         ulong shaderAddress = 0,
-        int baseVertex = 0)
+        int baseVertex = 0,
+        ulong drawSequence = 0)
     {
         if (pixelSpirv.Length == 0 ||
             targets.Count == 0 ||
@@ -1684,7 +1701,8 @@ internal static unsafe class VulkanVideoPresenter
                     targets.ToArray(),
                     depthTarget,
                     PublishTarget: true,
-                    shaderAddress));
+                    shaderAddress,
+                    drawSequence));
             foreach (var target in targets)
             {
                 _guestImageWorkSequences[target.Address] = workSequence;
@@ -1826,7 +1844,8 @@ internal static unsafe class VulkanVideoPresenter
         float green,
         float blue,
         float alpha,
-        ulong shaderAddress = 0)
+        ulong shaderAddress = 0,
+        ulong drawSequence = 0)
     {
         if (targets.Count == 0 ||
             targets.Count > 8 ||
@@ -1868,7 +1887,8 @@ internal static unsafe class VulkanVideoPresenter
                     green,
                     blue,
                     alpha,
-                    shaderAddress));
+                    shaderAddress,
+                    drawSequence));
             foreach (var target in targets)
             {
                 _guestImageWorkSequences[target.Address] = workSequence;
@@ -12974,6 +12994,146 @@ internal static unsafe class VulkanVideoPresenter
             }
         }
 
+        private static bool IsMinecraftDrawStateShader(ulong shaderAddress) =>
+            shaderAddress == MinecraftDrawStateShaderA ||
+            shaderAddress == MinecraftDrawStateShaderB ||
+            shaderAddress == MinecraftDrawStateShaderC;
+
+        private static bool TryTraceMinecraftDrawState()
+        {
+            if (!_traceMinecraftDrawState)
+            {
+                return false;
+            }
+
+            var count = Interlocked.Increment(ref _minecraftDrawStateTraceCount);
+            if (count > MinecraftDrawStateTraceBudget)
+            {
+                Interlocked.Decrement(ref _minecraftDrawStateTraceCount);
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void TraceMinecraftDrawStateResources(
+            VulkanOffscreenGuestDraw work,
+            TranslatedDrawResources resources,
+            IReadOnlyList<GuestImageResource> targets,
+            GuestDepthResource? depth)
+        {
+            if (!IsMinecraftDrawStateShader(work.ShaderAddress) ||
+                !TryTraceMinecraftDrawState())
+            {
+                return;
+            }
+
+            var textureTexts = new List<string>(resources.Textures.Length);
+            for (var index = 0; index < resources.Textures.Length; index++)
+            {
+                var resource = resources.Textures[index];
+                var guest = index < work.Draw.Textures.Count
+                    ? work.Draw.Textures[index]
+                    : null;
+                var address = resource?.Address ?? guest?.Address ?? 0;
+                var format = guest?.Format ?? 0;
+                var numberType = guest?.NumberType ?? 0;
+                var width = guest?.Width ?? 0;
+                var height = guest?.Height ?? 0;
+                var source = "none";
+                if (guest is not null && guest.IsFallback)
+                {
+                    source = "fallback";
+                }
+                else if (guest is { RgbaPixels.Length: > 0 })
+                {
+                    source = "cpu";
+                }
+
+                if (resource is not null)
+                {
+                    width = resource.Width;
+                    height = resource.Height;
+                    if (resource.NeedsUpload)
+                    {
+                        source = "upload";
+                    }
+                    else if (resource.Cached)
+                    {
+                        source = "cached";
+                    }
+                    else if (resource.FeedbackSource is not null)
+                    {
+                        source = "feedback";
+                    }
+                    else if (resource.DepthFeedbackSource is not null)
+                    {
+                        source = "depth_feedback";
+                    }
+                    else if (resource.GuestImage is not null)
+                    {
+                        source = resource.GuestImage.IsCpuBacked ? "guest_cpu" : "guest";
+                    }
+                    else if (source == "none")
+                    {
+                        source = "resource";
+                    }
+                }
+
+                var viewFormat = guest is not null
+                    ? GetTextureFormat(format, numberType)
+                    : Format.R8G8B8A8Unorm;
+                textureTexts.Add(
+                    $"0x{address:X}:f{format}/n{numberType}:{width}x{height}:vf{viewFormat}:" +
+                    $"lay{(resource?.IsStorage == true ? "ST" : "SR")}:src{source}");
+            }
+
+            var targetText = string.Join(
+                ',',
+                targets.Select(static target =>
+                    $"0x{target.Address:X}:{target.Width}x{target.Height}:vf{target.Format}:" +
+                    $"init{(target.Initialized ? 1 : 0)}:cpu{(target.IsCpuBacked ? 1 : 0)}"));
+            var depthText = depth is null
+                ? "none"
+                : $"0x{depth.Address:X}:{depth.Width}x{depth.Height}:init{(depth.Initialized ? 1 : 0)}";
+
+            Console.Error.WriteLine(
+                "[LOADER][TRACE] " +
+                $"vk.minecraft_draw_resources seq={work.DrawSequence} " +
+                $"vk_seq={CurrentGuestWorkSequenceForDiagnostics} " +
+                $"ps=0x{work.ShaderAddress:X16} publish={(work.PublishTarget ? 1 : 0)} " +
+                $"targets=[{targetText}] depth=[{depthText}] " +
+                $"textures=[{string.Join(',', textureTexts)}]");
+        }
+
+        private void TraceMinecraftDrawStateColorClear(VulkanOffscreenColorClear work)
+        {
+            if (!IsMinecraftDrawStateShader(work.ShaderAddress) ||
+                !TryTraceMinecraftDrawState())
+            {
+                return;
+            }
+
+            var targetText = string.Join(
+                ',',
+                work.Targets.Select(target =>
+                {
+                    var initialized =
+                        _guestImages.TryGetValue(target.Address, out var existing) &&
+                        existing.Initialized;
+                    return $"0x{target.Address:X}:{target.Width}x{target.Height}:" +
+                        $"f{target.Format}/n{target.NumberType}:init{(initialized ? 1 : 0)}";
+                }));
+            Console.Error.WriteLine(
+                "[LOADER][TRACE] " +
+                $"vk.minecraft_draw_resources seq={work.DrawSequence} " +
+                $"vk_seq={CurrentGuestWorkSequenceForDiagnostics} " +
+                $"ps=0x{work.ShaderAddress:X16} publish=1 kind=color_clear " +
+                $"rgba=({work.Red:0.###},{work.Green:0.###}," +
+                $"{work.Blue:0.###},{work.Alpha:0.###}) " +
+                $"targets=[{targetText}] depth=[none] textures=[]");
+        }
+
         private void ExecuteOffscreenDraw(VulkanOffscreenGuestDraw work)
         {
             if (_deviceLost || work.Targets.Count == 0)
@@ -13295,6 +13455,7 @@ internal static unsafe class VulkanVideoPresenter
                     $"ps=0x{work.ShaderAddress:X16} " +
                     $"first=0x{work.Targets[0].Address:X16} " +
                     $"{firstTarget.Width}x{firstTarget.Height}";
+                TraceMinecraftDrawStateResources(work, resources, targets, depth);
 
                 commandBuffer = BeginBatchedGuestCommands();
                 _commandBuffer = commandBuffer;
@@ -13689,6 +13850,7 @@ internal static unsafe class VulkanVideoPresenter
             }
 
             EnsureGuestSubmissionCapacity();
+            TraceMinecraftDrawStateColorClear(work);
             var commandBuffer = BeginBatchedGuestCommands();
             CloseOpenTranslatedRenderPass();
             var clearValue = new ClearColorValue(work.Red, work.Green, work.Blue, work.Alpha);
