@@ -1055,6 +1055,13 @@ internal static unsafe class VulkanVideoPresenter
             Environment.GetEnvironmentVariable("SHARPEMU_TRACE_FLIP_ORDER"),
             "1",
             StringComparison.Ordinal);
+
+    private static readonly bool _presentLatestCompletedGuestFlip =
+        string.Equals(
+            Environment.GetEnvironmentVariable(
+                "SHARPEMU_PRESENT_LATEST_COMPLETED_FLIP"),
+            "1",
+            StringComparison.Ordinal);
     private static readonly HashSet<(ulong Address, uint Width, uint Height)>
         _tracedGuestImageSubmissions = [];
     private static Thread? _thread;
@@ -2887,59 +2894,69 @@ internal static unsafe class VulkanVideoPresenter
         }
     }
 
-    private static bool TryTakePresentation(long presentedSequence, out Presentation presentation)
+    private static bool TryTakePresentation(
+        long presentedSequence,
+        out Presentation presentation)
     {
         lock (_gate)
         {
-            // Guest flips are retained in submission order. The renderer is
-            // deliberately allowed to lag a frame or two behind the guest
-            // while it drains expensive work, so use the first completed flip
-            // rather than repeatedly asking only for the newest one.
             while (_pendingGuestImagePresentations.Count > 0 &&
-                   _pendingGuestImagePresentations.Peek().Sequence <= presentedSequence)
+                   _pendingGuestImagePresentations
+                       .Peek()
+                       .Sequence <= presentedSequence)
             {
                 _pendingGuestImagePresentations.Dequeue();
             }
-
-            if (_pendingGuestImagePresentations.Count > 0)
+    
+            if (!_presentLatestCompletedGuestFlip)
             {
-                var pending = _pendingGuestImagePresentations.Peek();
-                if (IsGuestWorkCompletedLocked(pending.RequiredGuestWorkSequence))
+                // Comportamento original: apresenta o primeiro flip
+                // concluído, preservando a ordem completa da fila.
+                if (_pendingGuestImagePresentations.Count > 0)
                 {
-                    presentation = _pendingGuestImagePresentations.Dequeue();
-                    return true;
+                    var pending =
+                        _pendingGuestImagePresentations.Peek();
+    
+                    if (IsGuestWorkCompletedLocked(
+                            pending.RequiredGuestWorkSequence))
+                    {
+                        presentation =
+                            _pendingGuestImagePresentations.Dequeue();
+    
+                        return true;
+                    }
                 }
-
+    
                 presentation = default;
                 return false;
             }
-
-            if (_latestPresentation is not { } latest ||
-                latest.Sequence == presentedSequence ||
-                !IsGuestWorkCompletedLocked(latest.RequiredGuestWorkSequence))
+    
+            // Modo experimental: consome todos os flips já concluídos
+            // e retorna somente o mais recente.
+            //
+            // Isso não remove o VulkanOrderedGuestFlip da execução,
+            // não altera versões, waits ou sinalização do guest.
+            var foundCompletedPresentation = false;
+            presentation = default;
+    
+            while (_pendingGuestImagePresentations.Count > 0)
             {
-                if (_latestPresentation is { } rej &&
-                    rej.GuestImageAddress != 0 &&
-					rej.Sequence != presentedSequence &&
-                    _tracedGuestImagePresentRejections.Add(rej.Sequence))
+                var pending =
+                    _pendingGuestImagePresentations.Peek();
+    
+                if (!IsGuestWorkCompletedLocked(
+                        pending.RequiredGuestWorkSequence))
                 {
-                    var reason = rej.Sequence == presentedSequence
-                        ? "already-presented(seq==presented)"
-                        : !IsGuestWorkCompletedLocked(rej.RequiredGuestWorkSequence)
-                            ? $"work-not-done(req={rej.RequiredGuestWorkSequence}>" +
-                              $"contiguous_done={_completedGuestWorkSequence})"
-                            : "unknown";
-                    Console.Error.WriteLine(
-                        $"[LOADER][WARN] vk.guest_present_rejected addr=0x{rej.GuestImageAddress:X16} " +
-                        $"seq={rej.Sequence} presentedSeq={presentedSequence} reason={reason}");
+                    break;
                 }
-
-                presentation = default;
-                return false;
+    
+                presentation =
+                    _pendingGuestImagePresentations.Dequeue();
+    
+                foundCompletedPresentation = true;
             }
-
-            presentation = latest;
-            return true;
+    
+            return foundCompletedPresentation;
         }
     }
 

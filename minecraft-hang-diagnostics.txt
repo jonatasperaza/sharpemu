@@ -1,0 +1,1007 @@
+===== PROCESSO =====
+Microsoft.PowerShell.Commands.Internal.Format.FormatStartData
+Microsoft.PowerShell.Commands.Internal.Format.GroupStartData
+Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData
+Microsoft.PowerShell.Commands.Internal.Format.GroupEndData
+Microsoft.PowerShell.Commands.Internal.Format.FormatEndData
+
+===== STACK 1 =====
+Thread (0x133C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.WaitForHostMutexLock(class PthreadMutexState,class PthreadMutexWaiter)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteEntry(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryExecute(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntryCore(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class EntryFrameKind)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntry(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions)
+  SharpEmu.Core!SharpEmu.Core.Runtime.SharpEmuRuntime.Run(class System.String)
+  SharpEmu!SharpEmu.CLI.Program.RunEmulator(class System.String[],bool)
+  SharpEmu!SharpEmu.CLI.Program.Run(class System.String[])
+  SharpEmu!SharpEmu.CLI.Program.Main(class System.String[])
+
+Thread (0x54B0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54AC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x140):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3830):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x15E4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1368):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1FB4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54F0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__1()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3260):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass381_0.<StartReadyThreadDispatcher>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3080):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x202C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x56DC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x32F0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4BF8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x18C8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2EBC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3864):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2484):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x18CC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4D3C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2824):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xB50):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x55EC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5408):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5318):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x505C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x156C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2B20):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3C0C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4D98):
+  [Native Frames]
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.WaitForRenderWork()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.SdlHostWindow.Run(class System.Action,class System.Action`1<float64>,class System.Action,class System.Action)
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.Run()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter.Run()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1A50):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x48C8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x9E8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.KernelWaitEqueue(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteBlockedGuestThreadContinuation(class SharpEmu.HLE.CpuContext,value class SharpEmu.HLE.GuestCpuContinuation,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3478):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2CBC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2BCC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1AC4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54B8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4934):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4FF0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports+ContextState.PaceAdvance()
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports.AudioOut2ContextPush(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x358):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4890):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4A7C):
+  [Native Frames]
+  System.Net.Sockets.il!Interop+Winsock.recvfrom(class System.Net.Sockets.SafeSocketHandle,value class System.Span`1<unsigned int8>,int32,value class System.Net.Sockets.SocketFlags,value class System.Span`1<unsigned int8>,int32&)
+  System.Net.Sockets.il!System.Net.Sockets.Socket.ReceiveFrom(unsigned int8[],int32,int32,value class System.Net.Sockets.SocketFlags,class System.Net.EndPoint&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelSocketCompatExports.Recvfrom(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x33D0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x400C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+
+===== STACK 2 =====
+Thread (0x133C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.WaitForHostMutexLock(class PthreadMutexState,class PthreadMutexWaiter)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelPthreadCompatExports.PthreadMutexLockCore(class SharpEmu.HLE.CpuContext,unsigned int64,bool)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteEntry(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.TryExecute(class SharpEmu.HLE.CpuContext,unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class SharpEmu.HLE.OrbisGen2Result&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntryCore(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions,value class EntryFrameKind)
+  SharpEmu.Core!SharpEmu.Core.Cpu.CpuDispatcher.DispatchEntry(unsigned int64,value class SharpEmu.HLE.Generation,class System.Collections.Generic.IReadOnlyDictionary`2<unsigned int64,class System.String>,class System.Collections.Generic.IReadOnlyDictionary`2<class System.String,unsigned int64>,class System.String,value class SharpEmu.Core.Cpu.CpuExecutionOptions)
+  SharpEmu.Core!SharpEmu.Core.Runtime.SharpEmuRuntime.Run(class System.String)
+  SharpEmu!SharpEmu.CLI.Program.RunEmulator(class System.String[],bool)
+  SharpEmu!SharpEmu.CLI.Program.Run(class System.String[])
+  SharpEmu!SharpEmu.CLI.Program.Main(class System.String[])
+
+Thread (0x54B0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54AC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x140):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3830):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1368):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1FB4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54F0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass377_0.<StartStallWatchdog>b__1()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3260):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass381_0.<StartReadyThreadDispatcher>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3080):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x202C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x56DC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x32F0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4BF8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x18C8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2EBC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3864):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2484):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x18CC):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4D3C):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2824):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xB50):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x55EC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5408):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5318):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x505C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x156C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2B20):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3C0C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4D98):
+  [Native Frames]
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.WaitForRenderWork()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.SdlHostWindow.Run(class System.Action,class System.Action`1<float64>,class System.Action,class System.Action)
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter+Presenter.Run()
+  SharpEmu.Libs!SharpEmu.Libs.VideoOut.VulkanVideoPresenter.Run()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1A50):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x48C8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x9E8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelEventQueueCompatExports.KernelWaitEqueue(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestContinuationEntry(class SharpEmu.HLE.CpuContext,unsigned int64,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteBlockedGuestThreadContinuation(class SharpEmu.HLE.CpuContext,value class SharpEmu.HLE.GuestCpuContinuation,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3478):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2CBC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x2BCC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x1AC4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x54B8):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4934):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4FF0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Thread.Sleep(int32)
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports+ContextState.PaceAdvance()
+  SharpEmu.Libs!SharpEmu.Libs.Audio.AudioOut2Exports.AudioOut2ContextPush(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x358):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4890):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOne()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4A7C):
+  [Native Frames]
+  System.Net.Sockets.il!Interop+Winsock.recvfrom(class System.Net.Sockets.SafeSocketHandle,value class System.Span`1<unsigned int8>,int32,value class System.Net.Sockets.SocketFlags,value class System.Span`1<unsigned int8>,int32&)
+  System.Net.Sockets.il!System.Net.Sockets.Socket.ReceiveFrom(unsigned int8[],int32,int32,value class System.Net.Sockets.SocketFlags,class System.Net.EndPoint&)
+  SharpEmu.Libs!SharpEmu.Libs.Kernel.KernelSocketCompatExports.Recvfrom(class SharpEmu.HLE.CpuContext)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.DispatchImport(int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ImportDispatchGatewayManaged(int,int32,int)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.CallNativeEntry(void*)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.ExecuteGuestThreadEntry(class SharpEmu.HLE.CpuContext,unsigned int64,class System.String,class System.String&)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend.RunGuestThread(class GuestThreadState,class System.String)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+<>c__DisplayClass384_0.<ScheduleGuestThreadExecution>b__0()
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x33D0):
+  [Native Frames]
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner.ThreadMain(unsigned int64)
+  SharpEmu.Core!SharpEmu.Core.Cpu.Native.DirectExecutionBackend+GuestExecutionRunner+<>c__DisplayClass5_0.<.ctor>b__0()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xE68):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+
+===== FINAL DO LOG =====
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=163 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#159 version=163 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#160 sequence=160 requested_addr=0x00000000001E0000 requested_version=163 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=164 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#160 version=164 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#161 sequence=161 requested_addr=0x0000000000A50000 requested_version=164 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=165 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#161 version=165 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#162 sequence=162 requested_addr=0x00000000001E0000 requested_version=165 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=166 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#162 version=166 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#163 sequence=163 requested_addr=0x0000000000A50000 requested_version=166 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=167 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#163 version=167 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#164 sequence=164 requested_addr=0x00000000001E0000 requested_version=167 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=168 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#164 version=168 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#165 sequence=165 requested_addr=0x0000000000A50000 requested_version=168 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=169 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#165 version=169 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#166 sequence=166 requested_addr=0x00000000001E0000 requested_version=169 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=170 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#166 version=170 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#167 sequence=167 requested_addr=0x0000000000A50000 requested_version=170 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=171 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#167 version=171 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#168 sequence=168 requested_addr=0x00000000001E0000 requested_version=171 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.ordered_action_fence_wait count=8192 queue=graphics submission='SharpEmu offscreen mrt=1 ps=0x000000001448B600 first=0x0000000038EE0000 960x540'
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=172 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#168 version=172 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#169 sequence=169 requested_addr=0x0000000000A50000 requested_version=172 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=173 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#169 version=173 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#170 sequence=170 requested_addr=0x00000000001E0000 requested_version=173 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=174 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#170 version=174 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#171 sequence=171 requested_addr=0x0000000000A50000 requested_version=174 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=175 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#171 version=175 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#172 sequence=172 requested_addr=0x00000000001E0000 requested_version=175 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=176 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#172 version=176 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#173 sequence=173 requested_addr=0x0000000000A50000 requested_version=176 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][WARN] agc.rt_sampled#18000 addr=0x35120000 first=False gpu_resident=True fmt=6/7 known_targets=27
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=177 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#173 version=177 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#174 sequence=174 requested_addr=0x00000000001E0000 requested_version=177 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=178 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#174 version=178 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#175 sequence=175 requested_addr=0x0000000000A50000 requested_version=178 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=179 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#175 version=179 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458800 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.present_resolve#176 sequence=176 requested_addr=0x00000000001E0000 requested_version=179 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=180 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#176 version=180 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#177 sequence=177 requested_addr=0x0000000000A50000 requested_version=180 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=181 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#177 version=181 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#178 sequence=178 requested_addr=0x00000000001E0000 requested_version=181 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=182 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#178 version=182 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#179 sequence=179 requested_addr=0x0000000000A50000 requested_version=182 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=183 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#179 version=183 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#180 sequence=180 requested_addr=0x00000000001E0000 requested_version=183 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=184 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#180 version=184 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#181 sequence=181 requested_addr=0x0000000000A50000 requested_version=184 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=185 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#181 version=185 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#182 sequence=182 requested_addr=0x00000000001E0000 requested_version=185 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=186 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#182 version=186 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#183 sequence=183 requested_addr=0x0000000000A50000 requested_version=186 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=187 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#183 version=187 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.present_resolve#184 sequence=184 requested_addr=0x00000000001E0000 requested_version=187 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=188 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#184 version=188 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.present_resolve#185 sequence=185 requested_addr=0x0000000000A50000 requested_version=188 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=189 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#185 version=189 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#186 sequence=186 requested_addr=0x00000000001E0000 requested_version=189 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=190 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#186 version=190 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014414D00 mrt=1 vertices=4 primitive=6 publish=1
+[LOADER][TRACE] vk.present_resolve#187 sequence=187 requested_addr=0x0000000000A50000 requested_version=190 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=108 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014490900 mrt=1 vertices=66 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=300 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=60 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=54 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448EF00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x000000001448F900 mrt=1 vertices=36 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x0000000000A50000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=191 addr=0x0000000000A50000 handle=1 index=1 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#187 version=191 addr=0x0000000000A50000 handle=1 index=1 work_size=1920x1080 pitch=1920 source_addr=0x0000000000A50000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x0000000000A50000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#188 sequence=188 requested_addr=0x0000000000A50000 requested_version=191 owns_version=True resolved=True initialized=True resolved_addr=0x0000000000A50000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][WARN] agc.rt_sampled#20000 addr=0x35010000 first=False gpu_resident=True fmt=6/7 known_targets=27
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014481D00 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_write operation=draw addr=0x00000000001E0000 shader=0x0000000014458400 mrt=1 vertices=6 primitive=4 publish=1
+[LOADER][TRACE] vk.display_buffer_flip version=192 addr=0x00000000001E0000 handle=1 index=0 size=1920x1080 pitch=1920
+[LOADER][TRACE] vk.flip_capture_success#188 version=192 addr=0x00000000001E0000 handle=1 index=0 work_size=1920x1080 pitch=1920 source_addr=0x00000000001E0000 source_size=1920x1080 source_format=R8G8B8A8Unorm snapshot_addr=0x00000000001E0000 snapshot_size=1920x1080
+[LOADER][TRACE] vk.present_resolve#189 sequence=189 requested_addr=0x00000000001E0000 requested_version=192 owns_version=True resolved=True initialized=True resolved_addr=0x00000000001E0000 resolved_size=1920x1080 resolved_format=R8G8B8A8Unorm pixels=False translated=False
+[LOADER][INFO] Vulkan VideoOut swapchain recreate using fallback extent (window reported 0x0)
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after restored SDL window: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1080, format=B8G8R8A8Unorm
+[LOADER][INFO] SDL gamepad connected: PS4 Controller type=DualShock4 connection=Wireless
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after SDL drawable resize: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1061, format=B8G8R8A8Unorm
+[LOADER][INFO] SDL gamepad connected: PS4 Controller type=DualShock4 connection=Wireless
+[LOADER][INFO] SDL gamepad connected: PS4 Controller type=DualShock4 connection=Wireless
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after restored SDL window: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan pipeline cache saved: path=C:\Users\User\Documents\sharpemu\artifacts\bin\Release\net10.0\win-x64\user\pipeline_cache\PPSA17221\vulkan-pipeline-cache.bin bytes=6946760
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1061, format=B8G8R8A8Unorm
+[LOADER][INFO] SDL gamepad connected: PS4 Controller type=DualShock4 connection=Wireless
+[LOADER][INFO] SDL gamepad connected: PS4 Controller type=DualShock4 connection=Wireless
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after SDL drawable resize: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan pipeline cache saved: path=C:\Users\User\Documents\sharpemu\artifacts\bin\Release\net10.0\win-x64\user\pipeline_cache\PPSA17221\vulkan-pipeline-cache.bin bytes=6946760
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1080, format=B8G8R8A8Unorm
+[LOADER][INFO] Vulkan VideoOut recreating swapchain after restored SDL window: SuboptimalKhr
+[LOADER][INFO] Vulkan output color: requested=Auto display_hdr=False guest_hdr=False active=False format=B8G8R8A8Unorm colorspace=SpaceSrgbNonlinearKhr sdr_white=1,000 headroom=1,000
+[LOADER][INFO] Vulkan VideoOut recreated swapchain: 1920x1080, format=B8G8R8A8Unorm
