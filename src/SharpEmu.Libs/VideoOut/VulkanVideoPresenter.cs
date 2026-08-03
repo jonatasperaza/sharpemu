@@ -1065,6 +1065,61 @@ internal static unsafe class VulkanVideoPresenter
     private const ulong MinecraftDrawStateShaderB = 0x14481D00;
     private const ulong MinecraftDrawStateShaderC = 0x14458400;
     private static int _minecraftDrawStateTraceCount;
+    // SHARPEMU_TRACE_MINECRAFT_FRAME_PIPELINE=1: strictly observational,
+    // per-flip diagnostic for the Minecraft solid-frame hypothesis (a flip of
+    // the display buffer whose final 0x14458400 full-screen compose never ran,
+    // leaving the 0x14414D00 pre-compose result visible). Tracks real
+    // registered VideoOut display-buffer addresses (never the hardcoded
+    // address constants) and emits one vk.minecraft_frame_pipeline line per
+    // flip under a 400-flip budget plus up to 20 warning lines. No visual,
+    // synchronization, or scheduling behavior changes.
+    private static readonly bool _traceMinecraftFramePipeline = string.Equals(
+        Environment.GetEnvironmentVariable("SHARPEMU_TRACE_MINECRAFT_FRAME_PIPELINE"),
+        "1",
+        StringComparison.Ordinal);
+    private const int MinecraftFramePipelineTraceBudget = 400;
+    private const int MinecraftFramePipelineWarningBudget = 20;
+    private const ulong MinecraftFramePipelineComposeShader = 0x14458400;
+    private const ulong MinecraftFramePipelinePreComposeShader = 0x14414D00;
+    private static int _minecraftFramePipelineFlipCount;
+    private static int _minecraftFramePipelineWarningCount;
+    private static readonly Dictionary<ulong, MinecraftFramePipelineState>
+        _minecraftFramePipelineStates = new();
+    private static readonly object _minecraftFramePipelineGate = new();
+
+    private sealed class MinecraftFramePipelineState
+    {
+        public string LastWriterKind = "none";
+        public ulong LastWriterDrawSequence;
+        public long LastWriterVkSequence;
+        public ulong LastWriterShader;
+        public uint LastWriterBlendRaw;
+        public bool LastWriterBlendEnable;
+        public uint LastWriterBlendSrc;
+        public uint LastWriterBlendDst;
+        public uint LastWriterBlendFunc;
+        public uint LastWriterWriteMask;
+        public long LastWriterFlipVersion = -1;
+        public bool NormalComposeSeen;
+        public ulong NormalComposeSourceAddress;
+        public string NormalComposeSourceClass = "none";
+        public long NormalComposeSourceVersion = -1;
+        public bool FeedbackSeen;
+        public int FeedbackCount;
+        public int SourceCount;
+        public string SourceSummary = "none";
+        public long FlipVersion = -1;
+    }
+
+    static VulkanVideoPresenter()
+    {
+        if (_traceMinecraftFramePipeline)
+        {
+            Console.Error.WriteLine(
+                "[LOADER][TRACE] vk.minecraft_frame_pipeline_config " +
+                $"enabled=1 environment_value=1 budget={MinecraftFramePipelineTraceBudget}");
+        }
+    }
     private static readonly bool _traceFlipOrder =
         string.Equals(
             Environment.GetEnvironmentVariable("SHARPEMU_TRACE_FLIP_ORDER"),
@@ -6326,6 +6381,12 @@ internal static unsafe class VulkanVideoPresenter
                     $"[LOADER][WARN] vk.flip_capture_failed version={work.Version} " +
                     $"queue={_activeGuestQueue.Name} addr=0x{work.Address:X16} " +
                     $"found={(source is not null)} initialized={(source?.Initialized ?? false)}");
+                TraceMinecraftFramePipelineFlip(
+                    work,
+                    capture: "failed",
+                    resolved: source is not null,
+                    initialized: source?.Initialized == true,
+                    source);
                 return;
             }
 
@@ -6473,6 +6534,13 @@ internal static unsafe class VulkanVideoPresenter
                         $"snapshot_addr=0x{snapshot.Address:X16} " +
                         $"snapshot_size={snapshot.Width}x{snapshot.Height}");
                 }
+
+                TraceMinecraftFramePipelineFlip(
+                    work,
+                    capture: "success",
+                    resolved: true,
+                    initialized: true,
+                    source);
 
                 lock (_gate)
                 {
@@ -12112,6 +12180,7 @@ internal static unsafe class VulkanVideoPresenter
                     $"format={texture.Format}/{texture.NumberType} " +
                     $"size={texture.Width}x{texture.Height}");
             }
+            UpdateMinecraftFramePipelineCompute(work);
             var perfStart = Stopwatch.GetTimestamp();
             Interlocked.Increment(ref _perfDrawCount);
             PerfOverlay.RecordDraw();
@@ -13134,6 +13203,533 @@ internal static unsafe class VulkanVideoPresenter
                 $"targets=[{targetText}] depth=[none] textures=[]");
         }
 
+        private static bool TryTraceMinecraftFramePipeline()
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return false;
+            }
+
+            var count = Interlocked.Increment(ref _minecraftFramePipelineFlipCount);
+            if (count > MinecraftFramePipelineTraceBudget)
+            {
+                Interlocked.Decrement(ref _minecraftFramePipelineFlipCount);
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void WarnMinecraftFramePipeline(string message)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            var count = Interlocked.Increment(ref _minecraftFramePipelineWarningCount);
+            if (count <= MinecraftFramePipelineWarningBudget)
+            {
+                Console.Error.WriteLine(
+                    "[LOADER][TRACE] vk.minecraft_frame_pipeline_warning " + message);
+            }
+        }
+
+        // Display buffers registered through sceVideoOutRegisterBuffers remain
+        // valid flip targets even before AGC renders into them. The new
+        // per-buffer diagnostic keys on the real registration set instead of
+        // the fixed Minecraft address constants.
+        private static bool IsRegisteredDisplayBuffer(ulong address) =>
+            address != 0 && _availableGuestImages.ContainsKey(address);
+
+        private static uint ReconstructMinecraftBlendRaw(GuestBlendState blend) =>
+            (blend.Enable ? 1u << 30 : 0u) |
+            (blend.SeparateAlphaBlend ? 1u << 29 : 0u) |
+            (blend.AlphaDstFactor << 24) |
+            (blend.AlphaFunc << 21) |
+            (blend.AlphaSrcFactor << 16) |
+            (blend.ColorDstFactor << 8) |
+            (blend.ColorFunc << 5) |
+            (blend.ColorSrcFactor & 0x1Fu);
+
+        // Matches the guest CB_BLEND0_CONTROL raw value observed for the
+        // full-screen compose (ONE/ONE_MINUS_SRC_ALPHA/ADD both channels,
+        // write mask all-channels) or its exact decoded equivalent.
+        private static bool IsMinecraftNormalComposeBlend(GuestBlendState blend) =>
+            ReconstructMinecraftBlendRaw(blend) == 0x65010501u ||
+            blend.Enable &&
+            blend.ColorSrcFactor == 1 &&
+            blend.ColorDstFactor == 5 &&
+            blend.ColorFunc == 0 &&
+            blend.AlphaSrcFactor == 1 &&
+            blend.AlphaDstFactor == 5 &&
+            blend.AlphaFunc == 0 &&
+            blend.WriteMask == 0xFu;
+
+        // Full-screen 1920x1080 guest viewport; a negative height (RDNA
+        // Y-flip encoding) is accepted via the absolute value.
+        private static bool IsMinecraftNormalComposeViewport(GuestViewport? viewport) =>
+            viewport is { } value &&
+            Math.Abs(value.Width - 1920f) <= 0.5f &&
+            Math.Abs(Math.Abs(value.Height) - 1080f) <= 0.5f;
+
+        private static string FormatMinecraftViewport(GuestViewport? viewport) =>
+            viewport is { } value
+                ? $"{value.X:0.###}x{value.Y:0.###} {value.Width:0.###}x{value.Height:0.###} " +
+                  $"d{value.MinDepth:0.###}-{value.MaxDepth:0.###}"
+                : "none";
+
+        // Mirrors the real classification values used by the draw-state trace:
+        // upload, cached, feedback, depth_feedback, guest_cpu, guest, resource,
+        // fallback, cpu, none. "resource" marks a resource key (address+format+
+        // dimensions) with no backing guest image.
+        private static string GetMinecraftTextureSourceClass(
+            TextureResource? resource,
+            GuestDrawTexture? guest)
+        {
+            if (guest is not null && guest.IsFallback)
+            {
+                return "fallback";
+            }
+
+            var source = guest is { RgbaPixels.Length: > 0 } ? "cpu" : "none";
+            if (resource is null)
+            {
+                return source;
+            }
+
+            if (resource.NeedsUpload)
+            {
+                return "upload";
+            }
+
+            if (resource.Cached)
+            {
+                return "cached";
+            }
+
+            if (resource.FeedbackSource is not null)
+            {
+                return "feedback";
+            }
+
+            if (resource.DepthFeedbackSource is not null)
+            {
+                return "depth_feedback";
+            }
+
+            if (resource.GuestImage is not null)
+            {
+                return resource.GuestImage.IsCpuBacked ? "guest_cpu" : "guest";
+            }
+
+            return source == "none" ? "resource" : source;
+        }
+
+        private static string BuildMinecraftFramePipelineSourceSummary(
+            IReadOnlyList<GuestDrawTexture> guests,
+            IReadOnlyList<TextureResource> resources)
+        {
+            var parts = new List<string>(resources.Count);
+            for (var index = 0; index < resources.Count; index++)
+            {
+                var resource = resources[index];
+                var guest = index < guests.Count ? guests[index] : null;
+                var address = resource?.Address ?? guest?.Address ?? 0;
+                var format = guest?.Format ?? 0;
+                var numberType = guest?.NumberType ?? 0;
+                var width = resource?.Width ?? guest?.Width ?? 0;
+                var height = resource?.Height ?? guest?.Height ?? 0;
+                var version = resource?.GuestImage?.FlipVersion ??
+                    resource?.FeedbackSource?.FlipVersion ?? -1;
+                var layout = resource?.IsStorage == true ? "ST" : "SR";
+                parts.Add(
+                    $"0x{address:X}:f{format}/n{numberType}:{width}x{height}:" +
+                    $"lay{layout}:src{GetMinecraftTextureSourceClass(resource, guest)}:" +
+                    $"ver{version}");
+            }
+
+            return parts.Count == 0 ? "none" : string.Join(',', parts);
+        }
+
+        private static void RecordMinecraftFramePipelineWriter(
+            ulong address,
+            string kind,
+            ulong drawSequence,
+            ulong shader,
+            GuestBlendState? blend,
+            long flipVersion)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            lock (_minecraftFramePipelineGate)
+            {
+                if (!_minecraftFramePipelineStates.TryGetValue(address, out var state))
+                {
+                    state = new MinecraftFramePipelineState { FlipVersion = -1 };
+                    _minecraftFramePipelineStates.Add(address, state);
+                }
+
+                state.LastWriterKind = kind;
+                state.LastWriterDrawSequence = drawSequence;
+                state.LastWriterVkSequence = CurrentGuestWorkSequenceForDiagnostics;
+                state.LastWriterShader = shader;
+                state.LastWriterFlipVersion = flipVersion;
+                if (blend is { } value)
+                {
+                    state.LastWriterBlendRaw = ReconstructMinecraftBlendRaw(value);
+                    state.LastWriterBlendEnable = value.Enable;
+                    state.LastWriterBlendSrc = value.ColorSrcFactor;
+                    state.LastWriterBlendDst = value.ColorDstFactor;
+                    state.LastWriterBlendFunc = value.ColorFunc;
+                    state.LastWriterWriteMask = value.WriteMask;
+                }
+                else
+                {
+                    state.LastWriterBlendRaw = 0;
+                    state.LastWriterBlendEnable = false;
+                    state.LastWriterBlendSrc = 0;
+                    state.LastWriterBlendDst = 0;
+                    state.LastWriterBlendFunc = 0;
+                    state.LastWriterWriteMask = 0;
+                }
+            }
+        }
+
+        // Called after the draw's resources resolved: a display-buffer target
+        // records its writer plus this frame's compose/feedback/source state.
+        private static void UpdateMinecraftFramePipelineDraw(
+            VulkanOffscreenGuestDraw work,
+            TranslatedDrawResources resources,
+            IReadOnlyList<GuestImageResource> targets)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            for (var targetIndex = 0; targetIndex < targets.Count; targetIndex++)
+            {
+                var target = targets[targetIndex];
+                if (!IsRegisteredDisplayBuffer(target.Address))
+                {
+                    continue;
+                }
+
+                GuestBlendState? blend = resources.Blends.Length > 0
+                    ? resources.Blends[Math.Min(targetIndex, resources.Blends.Length - 1)]
+                    : null;
+                RecordMinecraftFramePipelineWriter(
+                    target.Address,
+                    "draw",
+                    work.DrawSequence,
+                    work.ShaderAddress,
+                    blend,
+                    target.FlipVersion);
+
+                var isComposeShader =
+                    work.ShaderAddress == MinecraftFramePipelineComposeShader;
+                var viewportMatches =
+                    IsMinecraftNormalComposeViewport(resources.Viewport);
+                var blendMatches =
+                    blend is { } value && IsMinecraftNormalComposeBlend(value);
+                var validSource = false;
+                var distinctSource = false;
+                TextureResource? composeSource = null;
+                GuestDrawTexture? composeGuest = null;
+                for (var textureIndex = 0;
+                     textureIndex < resources.Textures.Length;
+                     textureIndex++)
+                {
+                    var texture = resources.Textures[textureIndex];
+                    var guest = textureIndex < work.Draw.Textures.Count
+                        ? work.Draw.Textures[textureIndex]
+                        : null;
+                    if (texture is null ||
+                        texture.Address == 0 ||
+                        guest?.IsFallback == true)
+                    {
+                        continue;
+                    }
+
+                    validSource = true;
+                    var isTargetSnapshot =
+                        ReferenceEquals(texture.GuestImage, target) ||
+                        ReferenceEquals(texture.FeedbackSource, target) ||
+                        ReferenceEquals(texture.DepthFeedbackSource, target);
+                    if (!isTargetSnapshot)
+                    {
+                        distinctSource = true;
+                        composeSource ??= texture;
+                        composeGuest ??= guest;
+                    }
+                }
+
+                var composeSeen = isComposeShader &&
+                    viewportMatches &&
+                    blendMatches &&
+                    validSource &&
+                    distinctSource;
+
+                lock (_minecraftFramePipelineGate)
+                {
+                    if (!_minecraftFramePipelineStates.TryGetValue(
+                            target.Address,
+                            out var state))
+                    {
+                        state = new MinecraftFramePipelineState { FlipVersion = -1 };
+                        _minecraftFramePipelineStates.Add(target.Address, state);
+                    }
+
+                    state.NormalComposeSeen = composeSeen;
+                    if (composeSeen && composeSource is not null)
+                    {
+                        state.NormalComposeSourceAddress = composeSource.Address;
+                        state.NormalComposeSourceClass =
+                            GetMinecraftTextureSourceClass(composeSource, composeGuest);
+                        state.NormalComposeSourceVersion =
+                            composeSource.GuestImage?.FlipVersion ??
+                            composeSource.FeedbackSource?.FlipVersion ?? -1;
+                    }
+                    else
+                    {
+                        state.NormalComposeSourceAddress = 0;
+                        state.NormalComposeSourceClass = "none";
+                        state.NormalComposeSourceVersion = -1;
+                    }
+
+                    var feedbackCount = 0;
+                    foreach (var texture in resources.Textures)
+                    {
+                        if (texture is not null &&
+                            (texture.FeedbackSource is not null ||
+                             texture.DepthFeedbackSource is not null))
+                        {
+                            feedbackCount++;
+                        }
+                    }
+
+                    state.FeedbackSeen = feedbackCount > 0;
+                    state.FeedbackCount = feedbackCount;
+                    state.SourceCount = resources.Textures.Count(texture =>
+                        texture is not null && texture.Address != 0);
+                    state.SourceSummary = BuildMinecraftFramePipelineSourceSummary(
+                        work.Draw.Textures,
+                        resources.Textures);
+                }
+
+                if (isComposeShader && !composeSeen)
+                {
+                    WarnMinecraftFramePipeline(
+                        $"reason=compose_rejected addr=0x{target.Address:X16} " +
+                        $"ps=0x{work.ShaderAddress:X16} " +
+                        $"viewport={FormatMinecraftViewport(resources.Viewport)} " +
+                        $"blend=0x{(blend is { } raw ? ReconstructMinecraftBlendRaw(raw) : 0u):X8} " +
+                        $"viewport_match={(viewportMatches ? 1 : 0)} " +
+                        $"blend_match={(blendMatches ? 1 : 0)} " +
+                        $"sources={resources.Textures.Length} " +
+                        $"valid={(validSource ? 1 : 0)} " +
+                        $"distinct={(distinctSource ? 1 : 0)}");
+                }
+            }
+        }
+
+        private void UpdateMinecraftFramePipelineColorClear(
+            VulkanOffscreenColorClear work)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            foreach (var target in work.Targets)
+            {
+                if (!IsRegisteredDisplayBuffer(target.Address))
+                {
+                    continue;
+                }
+
+                var flipVersion = 0L;
+                if (_guestImages.TryGetValue(target.Address, out var image))
+                {
+                    flipVersion = image.FlipVersion;
+                }
+
+                RecordMinecraftFramePipelineWriter(
+                    target.Address,
+                    "clear",
+                    work.DrawSequence,
+                    work.ShaderAddress,
+                    blend: null,
+                    flipVersion);
+            }
+        }
+
+        private static void UpdateMinecraftFramePipelineGuestImageWrite(
+            VulkanGuestImageWrite work,
+            GuestImageResource target)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            if (!IsRegisteredDisplayBuffer(work.Address))
+            {
+                return;
+            }
+
+            RecordMinecraftFramePipelineWriter(
+                work.Address,
+                work.Pixels is null ? "fill" : "upload",
+                drawSequence: 0,
+                shader: 0,
+                blend: null,
+                target.FlipVersion);
+        }
+
+        private static void UpdateMinecraftFramePipelineCompute(
+            VulkanComputeGuestDispatch work)
+        {
+            if (!_traceMinecraftFramePipeline)
+            {
+                return;
+            }
+
+            foreach (var texture in work.Textures)
+            {
+                if (!texture.IsStorage || !IsRegisteredDisplayBuffer(texture.Address))
+                {
+                    continue;
+                }
+
+                RecordMinecraftFramePipelineWriter(
+                    texture.Address,
+                    "compute",
+                    drawSequence: 0,
+                    shader: work.ShaderAddress,
+                    blend: null,
+                    flipVersion: 0);
+            }
+        }
+
+        private void TraceMinecraftFramePipelineFlip(
+            VulkanOrderedGuestFlip work,
+            string capture,
+            bool resolved,
+            bool initialized,
+            GuestImageResource? source)
+        {
+            if (!TryTraceMinecraftFramePipeline())
+            {
+                return;
+            }
+
+            string lastWriterKind;
+            ulong lastWriterDrawSequence;
+            long lastWriterVkSequence;
+            ulong lastWriterShader;
+            uint lastWriterBlendRaw;
+            string lastWriterBlendDecoded;
+            long lastWriterFlipVersion;
+            int normalComposeSeen;
+            string composeSource;
+            int feedbackSeen;
+            int feedbackCount;
+            int sourceCount;
+            string sourceSummary;
+            lock (_minecraftFramePipelineGate)
+            {
+                if (!_minecraftFramePipelineStates.TryGetValue(work.Address, out var state))
+                {
+                    state = new MinecraftFramePipelineState { FlipVersion = -1 };
+                    _minecraftFramePipelineStates.Add(work.Address, state);
+                }
+
+                state.FlipVersion = work.Version;
+                lastWriterKind = state.LastWriterKind;
+                lastWriterDrawSequence = state.LastWriterDrawSequence;
+                lastWriterVkSequence = state.LastWriterVkSequence;
+                lastWriterShader = state.LastWriterShader;
+                lastWriterBlendRaw = state.LastWriterBlendRaw;
+                lastWriterBlendDecoded = lastWriterBlendRaw == 0
+                    ? "none"
+                    : $"e{(state.LastWriterBlendEnable ? 1 : 0)}/" +
+                      $"s{state.LastWriterBlendSrc}/d{state.LastWriterBlendDst}/" +
+                      $"f{state.LastWriterBlendFunc}/m{state.LastWriterWriteMask}";
+                lastWriterFlipVersion = state.LastWriterFlipVersion;
+                normalComposeSeen = state.NormalComposeSeen ? 1 : 0;
+                composeSource =
+                    $"0x{state.NormalComposeSourceAddress:X16}:" +
+                    $"{state.NormalComposeSourceClass}:ver{state.NormalComposeSourceVersion}";
+                feedbackSeen = state.FeedbackSeen ? 1 : 0;
+                feedbackCount = state.FeedbackCount;
+                sourceCount = state.SourceCount;
+                sourceSummary = state.SourceSummary;
+            }
+
+            var sourceAddress = source?.Address ?? work.Address;
+            var sourceSize = source is null
+                ? $"{work.Width}x{work.Height}"
+                : $"{source.Width}x{source.Height}";
+            var sourceFormat = source?.Format ?? Format.Undefined;
+            Console.Error.WriteLine(
+                "[LOADER][TRACE] " +
+                $"vk.minecraft_frame_pipeline version={work.Version} " +
+                $"addr=0x{work.Address:X16} " +
+                $"handle={work.VideoOutHandle} index={work.DisplayBufferIndex} " +
+                $"size={work.Width}x{work.Height} pitch={work.PitchInPixel} " +
+                $"capture={capture} resolved={(resolved ? 1 : 0)} " +
+                $"initialized={(initialized ? 1 : 0)} " +
+                $"source_addr=0x{sourceAddress:X16} source_size={sourceSize} " +
+                $"source_format={sourceFormat} " +
+                $"last_writer={lastWriterKind} " +
+                $"last_writer_seq={lastWriterDrawSequence} " +
+                $"last_writer_vk={lastWriterVkSequence} " +
+                $"last_writer_ps=0x{lastWriterShader:X16} " +
+                $"last_writer_blend=0x{lastWriterBlendRaw:X8} " +
+                $"last_writer_blend_decoded={lastWriterBlendDecoded} " +
+                $"last_writer_flip={lastWriterFlipVersion} " +
+                $"precompose_last={(lastWriterShader == MinecraftFramePipelinePreComposeShader ? 1 : 0)} " +
+                $"normal_compose_seen={normalComposeSeen} " +
+                $"compose_src={composeSource} " +
+                $"feedback_seen={feedbackSeen} feedback_count={feedbackCount} " +
+                $"source_count={sourceCount} " +
+                $"sources=[{sourceSummary}]");
+
+            if (lastWriterKind == "none")
+            {
+                WarnMinecraftFramePipeline(
+                    $"reason=unknown_writer version={work.Version} " +
+                    $"addr=0x{work.Address:X16}");
+            }
+
+            ResetMinecraftFramePipelinePerFlipFlags(work.Address);
+        }
+
+        private static void ResetMinecraftFramePipelinePerFlipFlags(ulong address)
+        {
+            lock (_minecraftFramePipelineGate)
+            {
+                if (!_minecraftFramePipelineStates.TryGetValue(address, out var state))
+                {
+                    return;
+                }
+
+                state.NormalComposeSeen = false;
+                state.NormalComposeSourceAddress = 0;
+                state.NormalComposeSourceClass = "none";
+                state.NormalComposeSourceVersion = -1;
+                state.FeedbackSeen = false;
+                state.FeedbackCount = 0;
+                state.SourceCount = 0;
+                state.SourceSummary = "none";
+            }
+        }
+
         private void ExecuteOffscreenDraw(VulkanOffscreenGuestDraw work)
         {
             if (_deviceLost || work.Targets.Count == 0)
@@ -13456,6 +14052,7 @@ internal static unsafe class VulkanVideoPresenter
                     $"first=0x{work.Targets[0].Address:X16} " +
                     $"{firstTarget.Width}x{firstTarget.Height}";
                 TraceMinecraftDrawStateResources(work, resources, targets, depth);
+                UpdateMinecraftFramePipelineDraw(work, resources, targets);
 
                 commandBuffer = BeginBatchedGuestCommands();
                 _commandBuffer = commandBuffer;
@@ -13851,6 +14448,7 @@ internal static unsafe class VulkanVideoPresenter
 
             EnsureGuestSubmissionCapacity();
             TraceMinecraftDrawStateColorClear(work);
+            UpdateMinecraftFramePipelineColorClear(work);
             var commandBuffer = BeginBatchedGuestCommands();
             CloseOpenTranslatedRenderPass();
             var clearValue = new ClearColorValue(work.Red, work.Green, work.Blue, work.Alpha);
@@ -13974,6 +14572,8 @@ internal static unsafe class VulkanVideoPresenter
             {
                 return;
             }
+
+            UpdateMinecraftFramePipelineGuestImageWrite(work, target);
 
             if (work.Pixels is { } pixels)
             {
