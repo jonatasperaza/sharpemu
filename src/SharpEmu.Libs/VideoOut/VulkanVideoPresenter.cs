@@ -501,6 +501,56 @@ internal static unsafe class VulkanVideoPresenter
         long EnqueuedTicks,
         VulkanGuestQueueIdentity Queue);
 
+    private const ulong FlipOrderDisplayBuffer0 =
+        0x00000000001E0000UL;
+    
+    private const ulong FlipOrderDisplayBuffer1 =
+        0x0000000000A50000UL;
+    
+    private const int MaxFlipOrderWriterHistory = 128;
+    private const int MaxFlipOrderTraces = 4096;
+    
+    private readonly record struct GuestImageWriterTrace(
+        long Sequence,
+        VulkanGuestQueueIdentity Queue,
+        string WorkType,
+        ulong Address,
+        ulong ShaderAddress,
+        bool PublishTarget,
+        bool Tracked);
+    
+    private readonly record struct GuestFlipOrderTrace(
+        long Version,
+        long FlipSequence,
+        long RequiredSequence,
+        VulkanGuestQueueIdentity Queue,
+        ulong Address,
+        GuestImageWriterTrace? WriterAtEnqueue,
+        GuestImageWriterTrace? WriterBeforeCapture);
+    
+    private static readonly Dictionary<
+        ulong,
+        Queue<GuestImageWriterTrace>>
+        _guestImageWriterTraceHistory = new();
+    
+    private static readonly Dictionary<
+        (ulong Address, long Sequence),
+        GuestImageWriterTrace>
+        _guestImageWriterTraceBySequence = new();
+    
+    private static readonly Dictionary<
+        ulong,
+        GuestImageWriterTrace>
+        _guestImageLastProcessedWriter = new();
+    
+    private static readonly Dictionary<
+        long,
+        GuestFlipOrderTrace>
+        _guestFlipOrderTraces = new();
+    
+    private static readonly Queue<long>
+        _guestFlipOrderTraceVersions = new();
+
     private static bool IsFlipOrderDisplayBuffer(ulong address) =>
         address == FlipOrderDisplayBuffer0 ||
         address == FlipOrderDisplayBuffer1;
