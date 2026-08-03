@@ -306,6 +306,19 @@ public static partial class AgcExports
         Environment.GetEnvironmentVariable("SHARPEMU_TRACE_VERTEX_RANGES"),
         "1",
         StringComparison.Ordinal);
+    // SHARPEMU_TRACE_MINECRAFT_CLEARS=1: trace full-screen clear candidates
+    // (DCC fast-clear quads and procedural clears) under a 500-line budget,
+    // reserving the tail of the budget for the 0x1E0000 / 0xA50000 framebuffer
+    // targets implicated in whole-frame solid-colour frames.
+    private static readonly bool _traceMinecraftClears = string.Equals(
+        Environment.GetEnvironmentVariable("SHARPEMU_TRACE_MINECRAFT_CLEARS"),
+        "1",
+        StringComparison.Ordinal);
+    private const int MinecraftClearTraceBudget = 500;
+    private const int MinecraftClearTracePriorityReserve = 100;
+    private const ulong MinecraftClearTraceTargetA = 0x1E0000;
+    private const ulong MinecraftClearTraceTargetB = 0xA50000;
+    private static int _minecraftClearTraceCount;
     private static readonly bool _compatibilitySubmitCompletionEvent = string.Equals(
         Environment.GetEnvironmentVariable("SHARPEMU_AGC_SUBMIT_COMPLETION_EVENT"),
         "1",
@@ -521,10 +534,8 @@ public static partial class AgcExports
         float ClearBlue = 0f,
         float ClearAlpha = 1f,
         IReadOnlyList<IGuestCompiledShader>? PerTargetPixelShaders = null,
-        IReadOnlyList<GuestRenderState>? PerTargetRenderStates = null);
-
+        IReadOnlyList<GuestRenderState>? PerTargetRenderStates = null,
         bool IsDccFastClear = false);
- drawing the clear quad (#738))
 
     private sealed record TranslatedImageBinding(
         TextureDescriptor Descriptor,
@@ -6819,6 +6830,8 @@ public static partial class AgcExports
                 out translationError))
         {
             state.TranslatedDraw = translatedDraw;
+            TraceMinecraftClearCandidate(state, drawSequence, translatedDraw);
+
             if (TryGetHardwareColorResolveTargets(
                     state.CxRegisters,
                     out var resolveSource,
@@ -6879,6 +6892,12 @@ public static partial class AgcExports
                 {
                     if (target.Address != 0)
                     {
+                        TraceMinecraftDccClearApplied(
+                            state,
+                            drawSequence,
+                            translatedDraw,
+                            target);
+
                         VulkanVideoPresenter.RequestGuestColorClear(target.Address);
                     }
                 }
@@ -6932,6 +6951,8 @@ public static partial class AgcExports
 
                 if (translatedDraw.IsFullscreenColorClear)
                 {
+                    TraceMinecraftProceduralClear(drawSequence, translatedDraw);
+
                     if (GuestMrtPassPlanner.RequiresSeparatePasses(translatedDraw.GuestTargets))
                     {
                         foreach (var target in translatedDraw.GuestTargets)
@@ -8014,7 +8035,7 @@ public static partial class AgcExports
                 vertexInputs,
                 renderState,
                 primitiveType,
-                vertexCount));
+                vertexCount);
 
         return true;
     }
@@ -8316,6 +8337,152 @@ public static partial class AgcExports
     // A float32x3 vertex position stream (BUF_DATA_FORMAT_32_32_32 / FLOAT).
     private const uint PositionDataFormat = 13;
     private const uint PositionNumberFormat = 7;
+
+    private static bool IsMinecraftClearPriorityTarget(RenderTargetDescriptor target) =>
+        target.Address == MinecraftClearTraceTargetA ||
+        target.Address == MinecraftClearTraceTargetB;
+
+    private static bool IsMinecraftClearPriorityTarget(GuestRenderTarget target) =>
+        target.Address == MinecraftClearTraceTargetA ||
+        target.Address == MinecraftClearTraceTargetB;
+
+    private static bool TraceMinecraftClear(bool priority, string message)
+    {
+        if (!_traceMinecraftClears)
+        {
+            return false;
+        }
+
+        // Reserve the tail of the 500-line budget for the priority framebuffers
+        // so a flood of unrelated clear quads cannot push them out of the trace.
+        if (!priority &&
+            _minecraftClearTraceCount >=
+                MinecraftClearTraceBudget - MinecraftClearTracePriorityReserve)
+        {
+            return false;
+        }
+
+        var count = Interlocked.Increment(ref _minecraftClearTraceCount);
+        if (count > MinecraftClearTraceBudget)
+        {
+            Interlocked.Decrement(ref _minecraftClearTraceCount);
+            return false;
+        }
+
+        Console.Error.WriteLine($"[LOADER][TRACE] {message}");
+        return true;
+    }
+
+    private static void TraceMinecraftClearCandidate(
+        SubmittedDcbState state,
+        ulong sequence,
+        TranslatedGuestDraw draw)
+    {
+        if (!_traceMinecraftClears ||
+            draw.Textures.Count != 0 ||
+            draw.VertexCount != 4 ||
+            draw.PrimitiveType != TriangleStripPrimitive)
+        {
+            return;
+        }
+
+        var targets = draw.RenderTargets;
+        var firstTarget = targets.FirstOrDefault();
+        var slot = firstTarget.Address != 0 ? firstTarget.Slot : 0;
+        var slotStride = slot * CbColorRegisterStride;
+        var registers = state.CxRegisters;
+        var hasInfo = registers.TryGetValue(CbColor0Info + slotStride, out var info);
+        var hasWord0 = registers.TryGetValue(
+            CbColor0ClearWord0 + slotStride,
+            out var clearWord0);
+        var hasWord1 = registers.TryGetValue(
+            CbColor0ClearWord1 + slotStride,
+            out var clearWord1);
+        var blendOk = draw.RenderState.Blends.Count != 0 &&
+            draw.RenderState.Blends.All(IsTransparentPremultipliedFillBlend);
+        var coversClip = CoversClipSpace(draw.VertexInputs, draw.VertexCount);
+        var result = IsDccFastClearDraw(
+            registers,
+            targets,
+            draw.Textures,
+            draw.VertexInputs,
+            draw.RenderState,
+            draw.PrimitiveType,
+            draw.VertexCount);
+
+        TraceMinecraftClear(
+            targets.Any(IsMinecraftClearPriorityTarget),
+            $"agc.clear_candidate seq={sequence} " +
+            $"ps=0x{draw.PixelShaderAddress:X16} " +
+            $"target=0x{firstTarget.Address:X} slot={slot} " +
+            $"format={firstTarget.Format} number_type={firstTarget.NumberType} " +
+            $"cb_info={(hasInfo ? $"0x{info:X8}" : "absent")} " +
+            $"dcc_enable={((hasInfo && (info & CbColorInfoDccEnableMask) != 0) ? 1 : 0)} " +
+            $"clear_word0={(hasWord0 ? $"0x{clearWord0:X8}" : "absent")} " +
+            $"clear_word1={(hasWord1 ? $"0x{clearWord1:X8}" : "absent")} " +
+            $"blend={(blendOk ? 1 : 0)} clip={(coversClip ? 1 : 0)} " +
+            $"result={(result ? 1 : 0)} " +
+            $"targets=[{string.Join(',', targets.Select(static target =>
+                $"0x{target.Address:X}:s{target.Slot}:f{target.Format}/n{target.NumberType}"))}]");
+    }
+
+    private static void TraceMinecraftDccClearApplied(
+        SubmittedDcbState state,
+        ulong sequence,
+        TranslatedGuestDraw draw,
+        GuestRenderTarget target)
+    {
+        if (!_traceMinecraftClears)
+        {
+            return;
+        }
+
+        var slot = 0u;
+        foreach (var renderTarget in draw.RenderTargets)
+        {
+            if (renderTarget.Address == target.Address)
+            {
+                slot = renderTarget.Slot;
+                break;
+            }
+        }
+
+        var slotStride = slot * CbColorRegisterStride;
+        state.CxRegisters.TryGetValue(
+            CbColor0ClearWord0 + slotStride,
+            out var clearWord0);
+        state.CxRegisters.TryGetValue(
+            CbColor0ClearWord1 + slotStride,
+            out var clearWord1);
+        TraceMinecraftClear(
+            IsMinecraftClearPriorityTarget(target),
+            $"agc.dcc_clear_applied seq={sequence} " +
+            $"ps=0x{draw.PixelShaderAddress:X16} " +
+            $"target=0x{target.Address:X} slot={slot} " +
+            $"word0=0x{clearWord0:X8} word1=0x{clearWord1:X8}");
+    }
+
+    private static void TraceMinecraftProceduralClear(
+        ulong sequence,
+        TranslatedGuestDraw draw)
+    {
+        if (!_traceMinecraftClears)
+        {
+            return;
+        }
+
+        var scalars = draw.PixelInitialScalars;
+        TraceMinecraftClear(
+            draw.GuestTargets.Any(IsMinecraftClearPriorityTarget),
+            $"agc.procedural_clear seq={sequence} " +
+            $"ps=0x{draw.PixelShaderAddress:X16} " +
+            $"targets=[{string.Join(',', draw.GuestTargets.Select(static target =>
+                $"0x{target.Address:X}:{target.Width}x{target.Height}:f{target.Format}/n{target.NumberType}"))}] " +
+            $"rgba=({draw.ClearRed:0.###},{draw.ClearGreen:0.###}," +
+            $"{draw.ClearBlue:0.###},{draw.ClearAlpha:0.###}) " +
+            $"scalars={scalars.Count} " +
+            $"s0={(scalars.Count > 0 ? $"0x{scalars[0]:X8}" : "absent")}");
+    }
 
     private static bool IsDccFastClearDraw(
         IReadOnlyDictionary<uint, uint> registers,
