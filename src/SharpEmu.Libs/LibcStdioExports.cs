@@ -130,30 +130,53 @@ public static class LibcStdioExports
             }
 
             _fileHandles[handle] = stream;
-
+            
             if (_traceStdio)
             {
                 Console.Error.WriteLine(
-                    $"[LOADER][TRACE] fopen: guest='{guestPath}' host='{hostPath}' mode='{mode}' -> OK handle=0x{handle:X} length={stream.Length}");
+                    $"[LOADER][TRACE] fopen: " +
+                    $"guest='{guestPath}' " +
+                    $"host='{hostPath}' " +
+                    $"mode='{mode}' " +
+                    $"-> OK handle=0x{handle:X} length={stream.Length}");
             }
-
+            
             ctx[CpuRegister.Rax] = handle;
-            ctx[CpuRegister.Rax] = 0;
-            
-            return ex switch
+            return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+            }
+            catch (Exception ex) when (
+                ex is IOException or
+                UnauthorizedAccessException or
+                ArgumentException or
+                NotSupportedException)
             {
-                UnauthorizedAccessException =>
-                    (int)OrbisGen2Result
-                        .ORBIS_GEN2_ERROR_PERMISSION_DENIED,
+                if (_traceStdio)
+                {
+                    Console.Error.WriteLine(
+                        $"[LOADER][TRACE] fopen: " +
+                        $"guest='{guestPath}' " +
+                        $"host='{hostPath}' " +
+                        $"mode='{mode}' " +
+                        $"-> FAILED {ex.GetType().Name}: {ex.Message}");
+                }
             
-                ArgumentException or NotSupportedException =>
-                    (int)OrbisGen2Result
-                        .ORBIS_GEN2_ERROR_INVALID_ARGUMENT,
+                ctx[CpuRegister.Rax] = 0;
             
-                _ =>
-                    (int)OrbisGen2Result
-                        .ORBIS_GEN2_ERROR_NOT_FOUND,
-            };
+                return ex switch
+                {
+                    UnauthorizedAccessException =>
+                        (int)OrbisGen2Result
+                            .ORBIS_GEN2_ERROR_PERMISSION_DENIED,
+            
+                    ArgumentException or NotSupportedException =>
+                        (int)OrbisGen2Result
+                            .ORBIS_GEN2_ERROR_INVALID_ARGUMENT,
+            
+                    _ =>
+                        (int)OrbisGen2Result
+                            .ORBIS_GEN2_ERROR_NOT_FOUND,
+                };
+            
         }
         catch (Exception ex) when (
             ex is IOException or
