@@ -67,6 +67,24 @@ public static class LibcStdioExports
         }
 
         var hostPath = KernelMemoryCompatExports.ResolveGuestPath(guestPath);
+        if (string.IsNullOrWhiteSpace(guestPath) ||
+            string.IsNullOrWhiteSpace(hostPath))
+        {
+            if (_traceStdio)
+            {
+                Console.Error.WriteLine(
+                    $"[LOADER][WARN] fopen_rejected " +
+                    $"guest='{guestPath}' " +
+                    $"host='{hostPath}' " +
+                    $"mode='{mode}' " +
+                    "reason=empty-path");
+            }
+        
+            ctx[CpuRegister.Rax] = 0;
+        
+            return (int)
+                OrbisGen2Result.ORBIS_GEN2_ERROR_INVALID_ARGUMENT;
+        }
         if (fileAccess != FileAccess.Read && KernelMemoryCompatExports.IsReadOnlyGuestMutationPath(guestPath))
         {
             if (_traceStdio)
@@ -120,9 +138,28 @@ public static class LibcStdioExports
             }
 
             ctx[CpuRegister.Rax] = handle;
-            return (int)OrbisGen2Result.ORBIS_GEN2_OK;
+            ctx[CpuRegister.Rax] = 0;
+            
+            return ex switch
+            {
+                UnauthorizedAccessException =>
+                    (int)OrbisGen2Result
+                        .ORBIS_GEN2_ERROR_PERMISSION_DENIED,
+            
+                ArgumentException or NotSupportedException =>
+                    (int)OrbisGen2Result
+                        .ORBIS_GEN2_ERROR_INVALID_ARGUMENT,
+            
+                _ =>
+                    (int)OrbisGen2Result
+                        .ORBIS_GEN2_ERROR_NOT_FOUND,
+            };
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (
+            ex is IOException or
+            UnauthorizedAccessException or
+            ArgumentException or
+            NotSupportedException)
         {
             if (_traceStdio)
             {

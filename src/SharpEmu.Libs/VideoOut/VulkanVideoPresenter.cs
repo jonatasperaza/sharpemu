@@ -501,6 +501,445 @@ internal static unsafe class VulkanVideoPresenter
         long EnqueuedTicks,
         VulkanGuestQueueIdentity Queue);
 
+    private static bool IsFlipOrderDisplayBuffer(ulong address) =>
+        address == FlipOrderDisplayBuffer0 ||
+        address == FlipOrderDisplayBuffer1;
+    
+    private static List<GuestImageWriterTrace> BuildFlipOrderWriterTraces(
+        object work,
+        long sequence,
+        VulkanGuestQueueIdentity queue)
+    {
+        var traces = new List<GuestImageWriterTrace>(2);
+        var seenAddresses = new HashSet<ulong>();
+    
+        void Add(
+            ulong address,
+            string workType,
+            ulong shaderAddress,
+            bool publishTarget,
+            bool tracked)
+        {
+            if (!IsFlipOrderDisplayBuffer(address) ||
+                !seenAddresses.Add(address))
+            {
+                return;
+            }
+    
+            traces.Add(
+                new GuestImageWriterTrace(
+                    sequence,
+                    queue,
+                    workType,
+                    address,
+                    shaderAddress,
+                    publishTarget,
+                    tracked));
+        }
+    
+        switch (work)
+        {
+            case VulkanOffscreenGuestDraw draw:
+                foreach (var target in draw.Targets)
+                {
+                    Add(
+                        target.Address,
+                        "draw",
+                        draw.ShaderAddress,
+                        draw.PublishTarget,
+                        tracked: draw.PublishTarget);
+                }
+    
+                foreach (var texture in draw.Draw.Textures)
+                {
+                    if (texture.IsStorage && texture.Address != 0)
+                    {
+                        Add(
+                            texture.Address,
+                            "draw-storage",
+                            draw.ShaderAddress,
+                            draw.PublishTarget,
+                            tracked: true);
+                    }
+                }
+    
+                break;
+    
+            case VulkanOffscreenColorClear clear:
+                foreach (var target in clear.Targets)
+                {
+                    Add(
+                        target.Address,
+                        "color-clear",
+                        clear.ShaderAddress,
+                        publishTarget: true,
+                        tracked: true);
+                }
+    
+                break;
+    
+            case VulkanComputeGuestDispatch compute:
+                foreach (var texture in compute.Textures)
+                {
+                    if (texture.IsStorage && texture.Address != 0)
+                    {
+                        Add(
+                            texture.Address,
+                            "compute-storage",
+                            compute.ShaderAddress,
+                            publishTarget: false,
+                            tracked: true);
+                    }
+                }
+    
+                break;
+    
+            case VulkanGuestImageWrite imageWrite:
+                Add(
+                    imageWrite.Address,
+                    "image-write",
+                    shaderAddress: 0,
+                    publishTarget: false,
+                    tracked: true);
+                break;
+        }
+    
+        return traces;
+    }
+    
+    private static string FormatFlipOrderWriter(
+        string prefix,
+        GuestImageWriterTrace? writer)
+    {
+        if (writer is not { } value)
+        {
+            return
+                $"{prefix}_seq=0 " +
+                $"{prefix}_queue=<none> " +
+                $"{prefix}_submission=0 " +
+                $"{prefix}_shader=0x0000000000000000 " +
+                $"{prefix}_type=<none> " +
+                $"{prefix}_publish=0 " +
+                $"{prefix}_tracked=0";
+        }
+    
+        return
+            $"{prefix}_seq={value.Sequence} " +
+            $"{prefix}_queue={value.Queue.Name} " +
+            $"{prefix}_submission={value.Queue.SubmissionId} " +
+            $"{prefix}_shader=0x{value.ShaderAddress:X16} " +
+            $"{prefix}_type={value.WorkType} " +
+            $"{prefix}_publish={(value.PublishTarget ? 1 : 0)} " +
+            $"{prefix}_tracked={(value.Tracked ? 1 : 0)}";
+    }
+    
+    private static void TraceFlipOrderEnqueueLocked(
+        object work,
+        long sequence,
+        long requiredSequence,
+        VulkanGuestQueueIdentity queue)
+    {
+        if (!_traceFlipOrder)
+        {
+            return;
+        }
+    
+        foreach (var writer in BuildFlipOrderWriterTraces(
+                     work,
+                     sequence,
+                     queue))
+        {
+            if (!_guestImageWriterTraceHistory.TryGetValue(
+                    writer.Address,
+                    out var history))
+            {
+                history = new Queue<GuestImageWriterTrace>();
+                _guestImageWriterTraceHistory.Add(
+                    writer.Address,
+                    history);
+            }
+    
+            history.Enqueue(writer);
+            _guestImageWriterTraceBySequence[
+                (writer.Address, writer.Sequence)] = writer;
+    
+            while (history.Count > MaxFlipOrderWriterHistory)
+            {
+                var removed = history.Dequeue();
+                _guestImageWriterTraceBySequence.Remove(
+                    (removed.Address, removed.Sequence));
+            }
+    
+            Console.Error.WriteLine(
+                $"[LOADER][TRACE] vk.display_writer_enqueue " +
+                $"sequence={writer.Sequence} " +
+                $"queue={writer.Queue.Name} " +
+                $"submission={writer.Queue.SubmissionId} " +
+                $"addr=0x{writer.Address:X16} " +
+                $"shader=0x{writer.ShaderAddress:X16} " +
+                $"work_type={writer.WorkType} " +
+                $"publish={(writer.PublishTarget ? 1 : 0)} " +
+                $"tracked={(writer.Tracked ? 1 : 0)}");
+        }
+    
+        if (work is not VulkanOrderedGuestFlip flip ||
+            !IsFlipOrderDisplayBuffer(flip.Address))
+        {
+            return;
+        }
+    
+        GuestImageWriterTrace? writerAtEnqueue = null;
+    
+        if (requiredSequence > 0 &&
+            _guestImageWriterTraceBySequence.TryGetValue(
+                (flip.Address, requiredSequence),
+                out var requiredWriter))
+        {
+            writerAtEnqueue = requiredWriter;
+        }
+    
+        var flipTrace = new GuestFlipOrderTrace(
+            flip.Version,
+            sequence,
+            requiredSequence,
+            queue,
+            flip.Address,
+            writerAtEnqueue,
+            WriterBeforeCapture: null);
+    
+        _guestFlipOrderTraces[flip.Version] = flipTrace;
+        _guestFlipOrderTraceVersions.Enqueue(flip.Version);
+    
+        while (_guestFlipOrderTraceVersions.Count >
+               MaxFlipOrderTraces)
+        {
+            var removedVersion =
+                _guestFlipOrderTraceVersions.Dequeue();
+    
+            _guestFlipOrderTraces.Remove(removedVersion);
+        }
+    
+        Console.Error.WriteLine(
+            $"[LOADER][TRACE] vk.flip_enqueue " +
+            $"version={flip.Version} " +
+            $"flip_sequence={sequence} " +
+            $"queue={queue.Name} " +
+            $"submission={queue.SubmissionId} " +
+            $"addr=0x{flip.Address:X16} " +
+            $"required_at_enqueue={requiredSequence} " +
+            FormatFlipOrderWriter(
+                "writer_at_enqueue",
+                writerAtEnqueue));
+    }
+    
+    private static void TraceFlipOrderProcessed(
+        in PendingGuestWork pending)
+    {
+        if (!_traceFlipOrder)
+        {
+            return;
+        }
+    
+        var writers = BuildFlipOrderWriterTraces(
+            pending.Work,
+            pending.Sequence,
+            pending.Queue);
+    
+        if (writers.Count == 0)
+        {
+            return;
+        }
+    
+        lock (_gate)
+        {
+            foreach (var writer in writers)
+            {
+                _guestImageLastProcessedWriter[writer.Address] =
+                    writer;
+    
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.display_writer_processed " +
+                    $"sequence={writer.Sequence} " +
+                    $"queue={writer.Queue.Name} " +
+                    $"submission={writer.Queue.SubmissionId} " +
+                    $"addr=0x{writer.Address:X16} " +
+                    $"shader=0x{writer.ShaderAddress:X16} " +
+                    $"work_type={writer.WorkType} " +
+                    $"publish={(writer.PublishTarget ? 1 : 0)} " +
+                    $"tracked={(writer.Tracked ? 1 : 0)}");
+            }
+        }
+    }
+    
+    private static void TraceFlipOrderExecute(
+        VulkanOrderedGuestFlip work,
+        long flipSequence,
+        VulkanGuestQueueIdentity flipQueue)
+    {
+        if (!_traceFlipOrder ||
+            !IsFlipOrderDisplayBuffer(work.Address))
+        {
+            return;
+        }
+    
+        lock (_gate)
+        {
+            var trace =
+                _guestFlipOrderTraces.TryGetValue(
+                    work.Version,
+                    out var existing)
+                    ? existing
+                    : new GuestFlipOrderTrace(
+                        work.Version,
+                        flipSequence,
+                        RequiredSequence: 0,
+                        flipQueue,
+                        work.Address,
+                        WriterAtEnqueue: null,
+                        WriterBeforeCapture: null);
+    
+            _guestImageWriterTraceHistory.TryGetValue(
+                work.Address,
+                out var history);
+    
+            GuestImageWriterTrace? latestEnqueued =
+                history is { Count: > 0 }
+                    ? history.Last()
+                    : null;
+    
+            _guestImageLastProcessedWriter.TryGetValue(
+                work.Address,
+                out var processedWriterValue);
+    
+            GuestImageWriterTrace? processedBeforeCapture =
+                _guestImageLastProcessedWriter.ContainsKey(
+                    work.Address)
+                    ? processedWriterValue
+                    : null;
+    
+            var laterWriters = history is null
+                ? Array.Empty<GuestImageWriterTrace>()
+                : history
+                    .Where(writer =>
+                        writer.Sequence > trace.FlipSequence)
+                    .ToArray();
+    
+            var laterSameQueue = laterWriters.Count(writer =>
+                string.Equals(
+                    writer.Queue.Name,
+                    trace.Queue.Name,
+                    StringComparison.Ordinal));
+    
+            var laterSameSubmission = laterWriters.Count(writer =>
+                string.Equals(
+                    writer.Queue.Name,
+                    trace.Queue.Name,
+                    StringComparison.Ordinal) &&
+                writer.Queue.SubmissionId ==
+                    trace.Queue.SubmissionId);
+    
+            var laterOtherQueue =
+                laterWriters.Length - laterSameQueue;
+    
+            var latestCompleted =
+                latestEnqueued is { } latest &&
+                IsGuestWorkCompletedLocked(latest.Sequence);
+    
+            trace = trace with
+            {
+                WriterBeforeCapture = processedBeforeCapture,
+            };
+    
+            _guestFlipOrderTraces[work.Version] = trace;
+    
+            Console.Error.WriteLine(
+                $"[LOADER][TRACE] vk.flip_execute " +
+                $"version={work.Version} " +
+                $"flip_sequence={trace.FlipSequence} " +
+                $"required_at_enqueue={trace.RequiredSequence} " +
+                $"queue={trace.Queue.Name} " +
+                $"submission={trace.Queue.SubmissionId} " +
+                $"addr=0x{work.Address:X16} " +
+                $"latest_completed={(latestCompleted ? 1 : 0)} " +
+                $"later_count={laterWriters.Length} " +
+                $"later_same_queue={laterSameQueue} " +
+                $"later_same_submission={laterSameSubmission} " +
+                $"later_other_queue={laterOtherQueue} " +
+                FormatFlipOrderWriter(
+                    "latest_enqueued",
+                    latestEnqueued) +
+                " " +
+                FormatFlipOrderWriter(
+                    "processed_before_capture",
+                    processedBeforeCapture));
+    
+            for (var index = 0;
+                 index < Math.Min(laterWriters.Length, 4);
+                 index++)
+            {
+                var writer = laterWriters[index];
+    
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.flip_later_writer " +
+                    $"version={work.Version} " +
+                    $"index={index} " +
+                    $"flip_sequence={trace.FlipSequence} " +
+                    FormatFlipOrderWriter(
+                        "writer",
+                        writer));
+            }
+        }
+    }
+    
+    private static void TraceFlipOrderPresented(
+        Presentation presentation)
+    {
+        if (!_traceFlipOrder ||
+            presentation.GuestImageVersion == 0 ||
+            !IsFlipOrderDisplayBuffer(
+                presentation.GuestImageAddress))
+        {
+            return;
+        }
+    
+        lock (_gate)
+        {
+            if (!_guestFlipOrderTraces.TryGetValue(
+                    presentation.GuestImageVersion,
+                    out var trace))
+            {
+                Console.Error.WriteLine(
+                    $"[LOADER][TRACE] vk.flip_present " +
+                    $"presentation_sequence={presentation.Sequence} " +
+                    $"version={presentation.GuestImageVersion} " +
+                    $"addr=0x{presentation.GuestImageAddress:X16} " +
+                    "trace_found=0");
+                return;
+            }
+    
+            Console.Error.WriteLine(
+                $"[LOADER][TRACE] vk.flip_present " +
+                $"presentation_sequence={presentation.Sequence} " +
+                $"version={presentation.GuestImageVersion} " +
+                $"addr=0x{presentation.GuestImageAddress:X16} " +
+                $"trace_found=1 " +
+                $"flip_sequence={trace.FlipSequence} " +
+                $"required_at_enqueue={trace.RequiredSequence} " +
+                $"queue={trace.Queue.Name} " +
+                $"submission={trace.Queue.SubmissionId} " +
+                FormatFlipOrderWriter(
+                    "writer_at_enqueue",
+                    trace.WriterAtEnqueue) +
+                " " +
+                FormatFlipOrderWriter(
+                    "processed_before_capture",
+                    trace.WriterBeforeCapture));
+    
+            _guestFlipOrderTraces.Remove(
+                presentation.GuestImageVersion);
+        }
+    }
+
     // PS5 exposes independent graphics and asynchronous-compute queues. A
     // single host FIFO adds dependencies that do not exist in the guest: one
     // slow ACB dispatch can delay a graphics clear until the CPU has reused
@@ -559,6 +998,11 @@ internal static unsafe class VulkanVideoPresenter
     private static readonly bool _traceGuestWorkCompletion =
         string.Equals(
             Environment.GetEnvironmentVariable("SHARPEMU_TRACE_GUEST_WORK_COMPLETION"),
+            "1",
+            StringComparison.Ordinal);
+    private static readonly bool _traceFlipOrder =
+        string.Equals(
+            Environment.GetEnvironmentVariable("SHARPEMU_TRACE_FLIP_ORDER"),
             "1",
             StringComparison.Ordinal);
     private static readonly HashSet<(ulong Address, uint Width, uint Height)>
@@ -801,6 +1245,11 @@ internal static unsafe class VulkanVideoPresenter
         _pendingGuestWorkBytes = 0;
         _pendingGuestImagePresentations.Clear();
         _guestImageWorkSequences.Clear();
+        _guestImageWriterTraceHistory.Clear();
+        _guestImageWriterTraceBySequence.Clear();
+        _guestImageLastProcessedWriter.Clear();
+        _guestFlipOrderTraces.Clear();
+        _guestFlipOrderTraceVersions.Clear();
 
         _availableGuestImages.Clear();
         _cpuBackedUploadGenerations.Clear();
@@ -2583,6 +3032,13 @@ internal static unsafe class VulkanVideoPresenter
         pendingQueue.AddLast(pending);
         }
         RecordGuestImageWritersLocked(work, sequence);
+        
+        TraceFlipOrderEnqueueLocked(
+            work,
+            sequence,
+            requiredSequence,
+            queue);
+        
         _pendingGuestWorkCount++;
         if (isPayloadWork)
         {
@@ -5738,6 +6194,10 @@ internal static unsafe class VulkanVideoPresenter
         private void ExecuteOrderedGuestFlip(VulkanOrderedGuestFlip work)
         {
             FlushBatchedGuestCommands();
+            TraceFlipOrderExecute(
+                work,
+                _activeGuestWorkSequence,
+                _activeGuestQueue);
             if (IsMinecraftDisplayBuffer(work.Address))
             {
                 Console.Error.WriteLine(
@@ -15090,6 +15550,7 @@ internal static unsafe class VulkanVideoPresenter
 
                             break;
                     }
+                    TraceFlipOrderProcessed(pendingGuestWork);
                 }
                 finally
                 {
@@ -15238,6 +15699,7 @@ internal static unsafe class VulkanVideoPresenter
                 presentation.Sequence,
                 presentation.GuestImageAddress,
                 presentation.GuestImageVersion);
+            TraceFlipOrderPresented(presentation);
             if (ShouldTracePresentedGuestImageContentsForDiagnostics())
             {
                 Console.Error.WriteLine(
